@@ -1,23 +1,26 @@
 <script setup lang="ts">
-// import { watch } from "vue";
+import { ref } from "vue";
 import { useDetailStore } from "../stores/taskDetail";
 import { useRoute } from "vue-router";
-
+// eslint-disable-next-line no-undef
+// const VanImagePreview = ImagePreview.Component;
 const route = useRoute();
 const detailStore = useDetailStore();
 const id = route.query.id;
 const type = route.query.type;
 console.log(id, type);
 
+let show = ref(false);
+const index = ref(0);
+const images = ["https://unpkg.com/@vant/assets/apple-1.jpeg"];
 const onClickLeft = () => history.back();
-
-// watch(
-//   () => route.query.id,
-//   async (newId) => {
-//     console.log("new", newId);
-//     // userData.value = await fetchUser(newId)
-//   }
-// );
+const previewImg = () => {
+  console.log("preview");
+  show.value = true;
+};
+const onChange = (newIndex: number) => {
+  index.value = newIndex;
+};
 </script>
 
 <template>
@@ -42,11 +45,12 @@ const onClickLeft = () => history.back();
           <div class="photo-content">
             <h3>拍摄照片</h3>
             <van-image
+              @click="previewImg"
               width="6rem"
               height="6rem"
               fit="cover"
               position="center"
-              src="https://unpkg.com/@vant/assets/cat.jpeg"
+              :src="images[0]"
             />
           </div>
           <van-divider></van-divider>
@@ -72,6 +76,11 @@ const onClickLeft = () => history.back();
         ></van-col
       >
     </van-row>
+    <!-- 自定义预览 -->
+    <van-image-preview v-model:show="show" :images="images" @change="onChange">
+      <template v-slot:index>第{{ index }}页</template>
+      <!-- <template v-slot:cover>hhhh</template> -->
+    </van-image-preview>
     <!-- <img class="demo" src="../assets/WechatIMG223.jpeg" alt="" /> -->
   </div>
 </template>
