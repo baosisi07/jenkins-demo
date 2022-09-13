@@ -6,7 +6,8 @@ import { useRoute } from "vue-router";
 const route = useRoute();
 const detailStore = useDetailStore();
 const id = route.query.id;
-console.log(id);
+const type = route.query.type;
+console.log(id, type);
 
 const onClickLeft = () => history.back();
 
@@ -32,6 +33,26 @@ const onClickLeft = () => history.back();
         size="large"
         :label="item.label"
       />
+      <van-cell class="image-cell">
+        <template #title>
+          <h3 class="photo">CEMS设备参数界面对比照片1</h3>
+        </template>
+        <template #label>
+          <van-divider></van-divider>
+          <div class="photo-content">
+            <h3>拍摄照片</h3>
+            <van-image
+              width="6rem"
+              height="6rem"
+              fit="cover"
+              position="center"
+              src="https://unpkg.com/@vant/assets/cat.jpeg"
+            />
+          </div>
+          <van-divider></van-divider>
+          <p class="photo-desc">图片描述信息</p>
+        </template>
+      </van-cell>
       <van-cell label="南京市" class="location-cell">
         <template #title> <h3 class="location">当前定位地点</h3> </template>
         <template #right-icon>
@@ -69,14 +90,21 @@ const onClickLeft = () => history.back();
   border-radius: 4px;
   font-size: 18px;
 }
-.location-cell {
+.location-cell,
+.image-cell {
   margin-top: 30px;
 }
 .location,
+.photo,
 .location-icon {
   color: var(--van-main-color);
 }
 .location-icon {
   font-size: 24px;
+}
+.photo-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

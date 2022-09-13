@@ -4,6 +4,7 @@ import { useHomeStore } from "../stores/taskList";
 import { useRouter } from "vue-router";
 interface subItem {
   id: number;
+  type: number;
   title: string;
   site: string;
   excutor: string;
@@ -38,6 +39,7 @@ const onLoad = () => {
         subList: [
           {
             id: 1,
+            type: 1,
             title: "hhh你好",
             site: "111",
             excutor: "bbb",
@@ -45,6 +47,7 @@ const onLoad = () => {
           },
           {
             id: 2,
+            type: 2,
             title: "ddd",
             site: "222",
             excutor: "bbb",
@@ -74,7 +77,7 @@ const onRefresh = () => {
 const toDetail = (item: any) => {
   router.push({
     name: `detail`,
-    query: { id: item.id },
+    query: { id: item.id, type: item.type },
   });
 };
 </script>
