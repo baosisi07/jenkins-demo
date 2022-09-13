@@ -1,8 +1,26 @@
+/* 自定义样式 */
 :root {
+    --van-main-color: #169186;
+
     --van-nav-bar-height: 56px;
     --van-nav-bar-background-color: #169186;
     --van-nav-bar-title-font-size: 18px;
     --van-nav-bar-title-text-color: #fff;
     
     --van-tab-font-size: 16px;
+
+    --van-cell-vertical-padding: 18px;
+    --van-collapse-item-content-line-height: 1.6;
+
+    --van-nav-bar-icon-color: #fff;
+    --van-nav-bar-arrow-size: 22px;
+
+    --van-cell-label-color: #333;
+    --van-cell-label-font-size: 16px;
+    --van-cell-label-margin-top: 10px;
+    --van-cell-group-background-color: #F0F6F6;
+
+}
+body {
+    background-color: #F0F6F6;
 }

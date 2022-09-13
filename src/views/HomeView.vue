@@ -1,34 +1,61 @@
 <script setup lang="ts">
 import { ref, reactive } from "vue";
+import { useHomeStore } from "../stores/taskList";
+import { useRouter } from "vue-router";
+interface subItem {
+  id: number;
+  title: string;
+  site: string;
+  excutor: string;
+  endTime: string;
+}
+interface Item {
+  id: number;
+  name: string;
+  subList: subItem[];
+}
+
+const router = useRouter();
+const homeStore = useHomeStore();
 const active = ref(0);
-const list = ref([]);
+const activeNames = ref(["1"]);
+let list: Item[] = reactive([]);
 const loading = ref(false);
 const finished = ref(false);
 const refreshing = ref(false);
 
-const state = reactive({
-  tabList: [
-    { name: "待办" },
-    { name: "完成" },
-    { name: "超时" },
-    { name: "临时" },
-    { name: "转派" },
-    { name: "待审核" },
-  ],
-});
 const onLoad = () => {
   setTimeout(() => {
     if (refreshing.value) {
-      list.value = [];
+      list = [];
       refreshing.value = false;
     }
 
     for (let i = 0; i < 10; i++) {
-      list.value.push(list.value.length + 1);
+      list.push({
+        name: `标题${list.length + 1}`,
+        id: list.length + 1,
+        subList: [
+          {
+            id: 1,
+            title: "hhh你好",
+            site: "111",
+            excutor: "bbb",
+            endTime: "2021-09-13",
+          },
+          {
+            id: 2,
+            title: "ddd",
+            site: "222",
+            excutor: "bbb",
+            endTime: "2021-09-13",
+          },
+        ],
+      });
     }
     loading.value = false;
 
-    if (list.value.length >= 40) {
+    if (list.length >= 40) {
       finished.value = true;
     }
   }, 1000);
@@ -42,6 +69,13 @@ const onRefresh = () => {
   // 将 loading 设置为 true，表示处于加载状态
   loading.value = true;
   onLoad();
+};
+
+const toDetail = (item: any) => {
+  router.push({
+    name: `detail`,
+    query: { id: item.id },
+  });
 };
 </script>
 
@@ -59,7 +93,7 @@ const onRefresh = () => {
       title-inactive-color="#5DB7AD"
     >
       <van-tab
-        v-for="(item, index) in state.tabList"
+        v-for="(item, index) in homeStore.tabList"
         :key="index"
         :title="item.name"
       >
@@ -70,7 +104,29 @@ const onRefresh = () => {
             finished-text="没有更多了"
             @load="onLoad"
           >
-            <van-cell v-for="item in list" :key="item" :title="item" />
+            <van-collapse v-model="activeNames">
+              <van-collapse-item
+                v-for="item in list"
+                :key="item.id"
+                :title="item.name"
+                :name="item.id"
+                size="large"
+              >
+                <div
+                  class="task-subitem"
+                  v-for="(s, i) in item.subList"
+                  :key="s.id"
+                  @click="toDetail(s)"
+                >
+                  <h3 class="task-subitem-title">{{ s.title }}</h3>
+                  <p>站点：{{ s.site }}</p>
+                  <p>执行人：{{ s.excutor }}</p>
+                  <p>结束时间：{{ s.endTime }}</p>
+                  <van-divider v-if="i !== item.subList.length - 1">
+                  </van-divider>
+                </div>
+              </van-collapse-item>
+            </van-collapse>
           </van-list>
         </van-pull-refresh>
       </van-tab>
@@ -78,11 +134,19 @@ const onRefresh = () => {
     <!-- <img class="demo" src="../assets/WechatIMG204.jpeg" alt="" /> -->
   </main>
 </template>
-<style>
+<style lang="scss" scoped>
 .van-hairline--bottom:after {
   border-bottom-width: 0;
 }
 .demo {
   width: 100%;
+}
+.task-subitem {
+  p {
+    line-height: 1.8;
+  }
+}
+.task-subitem-title {
+  color: var(--van-main-color);
 }
 </style>
