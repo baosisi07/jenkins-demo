@@ -2,24 +2,29 @@
 import { ref } from "vue";
 import { useDetailStore } from "../stores/taskDetail";
 import { useRoute } from "vue-router";
-// eslint-disable-next-line no-undef
-// const VanImagePreview = ImagePreview.Component;
+import { ImagePreview } from "vant";
+import "vant/es/image-preview/style";
+
 const route = useRoute();
 const detailStore = useDetailStore();
 const id = route.query.id;
 const type = route.query.type;
 console.log(id, type);
 
-let show = ref(false);
-const index = ref(0);
+const VanImagePreview = ImagePreview.Component;
+let isShow = ref(false);
 const images = ["https://unpkg.com/@vant/assets/apple-1.jpeg"];
 const onClickLeft = () => history.back();
 const previewImg = () => {
-  console.log("preview");
-  show.value = true;
+  isShow.value = true;
 };
-const onChange = (newIndex: number) => {
-  index.value = newIndex;
+const rotateImg = () => {
+  const img = document.getElementsByClassName("van-image__img")[0] as Record<
+    string,
+    any
+  >;
+  img.style.setProperty("transform", "rotate(90deg)");
+  console.log(img.style.transform);
 };
 </script>
 
@@ -77,9 +82,20 @@ const onChange = (newIndex: number) => {
       >
     </van-row>
     <!-- 自定义预览 -->
-    <van-image-preview v-model:show="show" :images="images" @change="onChange">
-      <template v-slot:index>第{{ index }}页</template>
-      <!-- <template v-slot:cover>hhhh</template> -->
+    <van-image-preview
+      v-model:show="isShow"
+      :show-index="false"
+      :images="images"
+      class-name="user-upload-img"
+    >
+      <template v-slot:cover>
+        <div class="action-bar">
+          <div class="rotate-action" @click="rotateImg">
+            <van-icon name="replay" size="24px" color="#fff" />
+            <span class="rotate-txt">旋转</span>
+          </div>
+        </div>
+      </template>
     </van-image-preview>
     <!-- <img class="demo" src="../assets/WechatIMG223.jpeg" alt="" /> -->
   </div>
@@ -115,5 +131,18 @@ const onChange = (newIndex: number) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.action-bar {
+  width: 100vw;
+  display: flex;
+  justify-content: end;
+  padding: 20px;
+  color: #fff;
+  .rotate-action {
+    display: flex;
+  }
+  .rotate-txt {
+    margin-left: 6px;
+  }
 }
 </style>
