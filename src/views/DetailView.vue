@@ -18,12 +18,14 @@ const onClickLeft = () => history.back();
 const previewImg = () => {
   isShow.value = true;
 };
+let deg = ref(0);
 const rotateImg = () => {
-  const img = document.getElementsByClassName("van-image__img")[0] as Record<
+  deg.value = deg.value + 90;
+  const img = document.getElementsByClassName("van-image__img")[1] as Record<
     string,
     any
   >;
-  img.style.setProperty("transform", "rotate(90deg)");
+  img.style.setProperty("transform", `rotate(${deg.value % 360}deg)`);
   console.log(img.style.transform);
 };
 </script>
@@ -70,16 +72,22 @@ const rotateImg = () => {
       </van-cell>
     </van-cell-group>
     <van-row justify="center" class="btn-wrapper">
-      <van-col span="8"
-        ><van-button class="custom-btn" block color="#169186"
-          >提交</van-button
-        ></van-col
-      >
-      <van-col span="8" offset="2"
-        ><van-button class="custom-btn" color="#FFB12A" block
-          >转派</van-button
-        ></van-col
-      >
+      <van-col span="8">
+        <van-button class="custom-btn" block color="#169186">提交</van-button>
+      </van-col>
+      <van-col span="8" offset="2">
+        <van-button class="custom-btn" color="#FFB12A" block>转派</van-button>
+      </van-col>
+    </van-row>
+    <van-row justify="center" class="btn-wrapper">
+      <van-col span="14">
+        <van-button class="custom-btn" color="#FFB12A" block>指派</van-button>
+      </van-col>
+    </van-row>
+    <van-row justify="center" class="btn-wrapper">
+      <van-col span="14">
+        <van-button class="custom-btn" color="#FFB12A" block>审核</van-button>
+      </van-col>
     </van-row>
     <!-- 自定义预览 -->
     <van-image-preview
