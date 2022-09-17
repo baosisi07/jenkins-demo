@@ -4,7 +4,7 @@ import { useDetailStore } from "../stores/taskDetail";
 import { useRoute } from "vue-router";
 import { ImagePreview } from "vant";
 import "vant/es/image-preview/style";
-
+import { getLocation } from "../utils/location";
 const route = useRoute();
 const detailStore = useDetailStore();
 const id = route.query.id;
@@ -28,6 +28,7 @@ const rotateImg = () => {
   img.style.setProperty("transform", `rotate(${deg.value % 360}deg)`);
   console.log(img.style.transform);
 };
+getLocation();
 </script>
 
 <template>
@@ -50,7 +51,7 @@ const rotateImg = () => {
         <template #label>
           <van-divider></van-divider>
           <div class="photo-content">
-            <h3>拍摄照片</h3>
+            <h4>拍摄照片</h4>
             <van-image
               @click="previewImg"
               width="6rem"
@@ -64,10 +65,14 @@ const rotateImg = () => {
           <p class="photo-desc">图片描述信息</p>
         </template>
       </van-cell>
-      <van-cell label="南京市" class="location-cell">
+      <van-cell :label="detailStore.locationName" class="location-cell">
         <template #title> <h3 class="location">当前定位地点</h3> </template>
         <template #right-icon>
-          <van-icon name="location" class="location-icon" />
+          <van-icon
+            name="location"
+            class="location-icon"
+            @click="getLocation"
+          />
         </template>
       </van-cell>
     </van-cell-group>

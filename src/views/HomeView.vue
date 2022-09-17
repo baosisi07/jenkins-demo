@@ -80,11 +80,20 @@ const toDetail = (item: any) => {
     query: { id: item.id, type: item.type },
   });
 };
+const createTask = () => {
+  router.push({
+    name: `create`,
+  });
+};
 </script>
 
 <template>
   <main>
-    <van-nav-bar title="运维" />
+    <van-nav-bar title="运维">
+      <template #right>
+        <van-icon name="plus" size="20" @click="createTask" />
+      </template>
+    </van-nav-bar>
     <!-- scrollspy -->
     <van-tabs
       v-model:active="active"

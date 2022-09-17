@@ -22,5 +22,6 @@ export const useDetailStore = defineStore("detail", {
       { name: "提醒时间", value: "" },
       { name: "任务描述", value: "", label: "哈哈哈" },
     ],
+    locationName: "",
   }),
 });
