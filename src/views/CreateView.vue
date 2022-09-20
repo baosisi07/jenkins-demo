@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { Dialog } from "vant";
 import { ref, reactive } from "vue";
 import { useNewTaskStore } from "../stores/newTask";
-// import { useRoute } from "vue-router";
+import "vant/es/dialog/style";
 
-// const route = useRoute();
 const newTaskStore = useNewTaskStore();
 
 const formValues = reactive({
@@ -18,10 +18,40 @@ const formValues = reactive({
   taskDesc: "",
   listName: "",
   calendarName: "",
+  fileList: [],
+  fileInfo: [],
 });
 
+const isShowPreview = ref(false);
+const imgIndex = ref(0);
+const showPreview = () => {
+  isShowPreview.value = true;
+};
+
+const afterRead = (file: any, detail: any) => {
+  // 此时可以自行将文件上传至服务器
+  console.log(file, detail);
+
+  imgIndex.value = detail.index;
+};
+const beforeDel = (file: any, detail: any) => {
+  return Dialog.confirm({
+    message: "删除当前子任务？",
+    confirmButtonColor: "#169186",
+  })
+    .then(() => {
+      // on confirm
+      formValues.fileInfo.splice(detail.index, 1);
+      return true;
+    })
+    .catch(() => {
+      // on cancel
+      return false;
+    });
+};
+
 const onSubmit = (values: any) => {
-  console.log("submit", values);
+  console.log("submit", values, formValues);
 };
 
 const showPicker = ref(false);
@@ -181,6 +211,41 @@ const onClickLeft = () => history.back();
           type="textarea"
           placeholder="请输入任务描述"
         />
+        <div class="upload-wrapper">
+          <van-uploader
+            v-model="formValues.fileList"
+            preview-size="80"
+            :preview-full-image="false"
+            :after-read="afterRead"
+            :before-delete="beforeDel"
+          >
+            <template #preview-cover="{}">
+              <div class="img-cover-area" @click="showPreview"></div>
+              <!-- <van-field
+                class="img-field"
+                v-model="formValues.fileInfo[imgIndex]"
+                rows="1"
+                name="imgDesc"
+                type="textarea"
+                :autosize="{ maxHeight: 44 }"
+                placeholder="请输入描述信息"
+              /> -->
+            </template>
+          </van-uploader>
+          <div class="img-desc-list" v-if="formValues.fileList.length > 0">
+            <van-field
+              v-for="(s, i) in formValues.fileList"
+              :key="i"
+              class="img-field-item"
+              v-model="formValues.fileInfo[i]"
+              rows="1"
+              name="imgDesc"
+              type="textarea"
+              :autosize="{ maxHeight: 44 }"
+              placeholder="请输入描述信息"
+            />
+          </div>
+        </div>
       </van-cell-group>
       <div style="margin: 16px">
         <van-button round block type="primary" native-type="submit">
@@ -188,7 +253,53 @@ const onClickLeft = () => history.back();
         </van-button>
       </div>
     </van-form>
+    <preview-imgs
+      :isShow="isShowPreview"
+      :images="formValues.fileList"
+      :startPosition="imgIndex"
+      showIndex
+    ></preview-imgs>
   </div>
 </template>
+<style lang="scss" scoped>
+.upload-wrapper {
+  position: relative;
+  padding: 18px 16px;
+}
+.img-cover-area {
+  width: 100%;
+  height: 100%;
+}
+.img-desc-list {
+  position: absolute;
+  padding: 18px 0;
+  left: 96px;
+  top: 0;
+  right: 16px;
+}
+.img-field-item {
+  display: flex;
+  height: 80px;
+  margin-bottom: 8px;
+}
+.img-field {
+  position: absolute;
+  left: 80px;
+  box-sizing: border-box;
+  width: calc(100vw - 112px);
+}
+</style>
 
-<style lang="scss" scoped></style>
+<style lang="scss">
+.van-uploader__wrapper {
+  flex-direction: column;
+}
+.van-uploader__preview-image {
+  display: flex;
+  overflow: visible;
+}
+.van-uploader__preview-cover {
+  display: flex;
+  align-items: center;
+}
+</style>

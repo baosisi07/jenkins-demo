@@ -2,8 +2,7 @@
 import { ref } from "vue";
 import { useDetailStore } from "../stores/taskDetail";
 import { useRoute } from "vue-router";
-import { ImagePreview } from "vant";
-import "vant/es/image-preview/style";
+
 import { getLocation } from "../utils/location";
 const route = useRoute();
 const detailStore = useDetailStore();
@@ -11,23 +10,13 @@ const id = route.query.id;
 const type = route.query.type;
 console.log(id, type);
 
-const VanImagePreview = ImagePreview.Component;
 let isShow = ref(false);
 const images = ["https://unpkg.com/@vant/assets/apple-1.jpeg"];
 const onClickLeft = () => history.back();
 const previewImg = () => {
   isShow.value = true;
 };
-let deg = ref(0);
-const rotateImg = () => {
-  deg.value = deg.value + 90;
-  const img = document.getElementsByClassName("van-image__img")[1] as Record<
-    string,
-    any
-  >;
-  img.style.setProperty("transform", `rotate(${deg.value % 360}deg)`);
-  console.log(img.style.transform);
-};
+
 getLocation();
 </script>
 
@@ -95,21 +84,7 @@ getLocation();
       </van-col>
     </van-row>
     <!-- 自定义预览 -->
-    <van-image-preview
-      v-model:show="isShow"
-      :show-index="false"
-      :images="images"
-      class-name="user-upload-img"
-    >
-      <template v-slot:cover>
-        <div class="action-bar">
-          <div class="rotate-action" @click="rotateImg">
-            <van-icon name="replay" size="24px" color="#fff" />
-            <span class="rotate-txt">旋转</span>
-          </div>
-        </div>
-      </template>
-    </van-image-preview>
+    <preview-imgs :isShow="isShow" :images="images"></preview-imgs>
     <!-- <img class="demo" src="../assets/WechatIMG223.jpeg" alt="" /> -->
   </div>
 </template>
@@ -144,18 +119,5 @@ getLocation();
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-.action-bar {
-  width: 100vw;
-  display: flex;
-  justify-content: end;
-  padding: 20px;
-  color: #fff;
-  .rotate-action {
-    display: flex;
-  }
-  .rotate-txt {
-    margin-left: 6px;
-  }
 }
 </style>

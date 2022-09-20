@@ -8,6 +8,8 @@ export {}
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    PreviewImg: typeof import('./src/components/previewImg.vue')['default']
+    PreviewImgs: typeof import('./src/components/PreviewImgs.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     VanButton: typeof import('vant/es')['Button']
@@ -31,5 +33,6 @@ declare module '@vue/runtime-core' {
     VanRow: typeof import('vant/es')['Row']
     VanTab: typeof import('vant/es')['Tab']
     VanTabs: typeof import('vant/es')['Tabs']
+    VanUploader: typeof import('vant/es')['Uploader']
   }
 }
