@@ -102,7 +102,16 @@ const onConfirm = (value: string) => {
   showPicker.value = false;
 };
 
-const onClickLeft = () => history.back();
+const onClickLeft = () => {
+  Dialog.confirm({
+    message: "确定放弃当前任务的修改吗？",
+    confirmButtonColor: "#169186",
+  })
+    .then(() => {
+      history.back();
+    })
+    .catch(() => {});
+};
 </script>
 
 <template>
