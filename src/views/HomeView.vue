@@ -2,6 +2,8 @@
 import { ref, reactive } from "vue";
 import { useHomeStore } from "../stores/taskList";
 import { useRouter } from "vue-router";
+import api from "../http/api";
+
 interface subItem {
   id: number;
   type: number;
@@ -11,8 +13,8 @@ interface subItem {
   endTime: string;
 }
 interface Item {
-  id: number;
-  name: string;
+  siteid: number;
+  site: string;
   subList: subItem[];
 }
 
@@ -25,45 +27,21 @@ const loading = ref(false);
 const finished = ref(false);
 const refreshing = ref(false);
 
-const onLoad = () => {
-  setTimeout(() => {
-    if (refreshing.value) {
-      list = [];
-      refreshing.value = false;
-    }
+const getSiteList = async (type: string = "todo") => {
+  await api.task.getTaskList({ type });
+  if (refreshing.value) {
+    list = [];
+    refreshing.value = false;
+  }
 
-    for (let i = 0; i < 10; i++) {
-      list.push({
-        name: `标题${list.length + 1}`,
-        id: list.length + 1,
-        subList: [
-          {
-            id: 1,
-            type: 1,
-            title: "hhh你好",
-            site: "111",
-            excutor: "bbb",
-            endTime: "2021-09-13",
-          },
-          {
-            id: 2,
-            type: 2,
-            title: "ddd",
-            site: "222",
-            excutor: "bbb",
-            endTime: "2021-09-13",
-          },
-        ],
-      });
-    }
-    loading.value = false;
-
-    if (list.length >= 40) {
-      finished.value = true;
-    }
-  }, 1000);
+  loading.value = false;
+  // 因为没有分页
+  finished.value = true;
 };
-
+const switchList = (name: string, title: string) => {
+  console.log(name, title);
+  getSiteList(name);
+};
 const onRefresh = () => {
   // 清空列表数据
   finished.value = false;
@@ -71,7 +49,7 @@ const onRefresh = () => {
   // 重新加载数据
   // 将 loading 设置为 true，表示处于加载状态
   loading.value = true;
-  onLoad();
+  getSiteList();
 };
 
 const toDetail = (item: any) => {
@@ -98,6 +76,7 @@ const createTask = () => {
     <van-tabs
       v-model:active="active"
       swipeable
+      @change="switchList"
       color="#fff"
       line-height="2px"
       background="#169186"
@@ -107,21 +86,22 @@ const createTask = () => {
       <van-tab
         v-for="(item, index) in homeStore.tabList"
         :key="index"
-        :title="item.name"
+        :title="item.title"
+        :name="item.name"
       >
         <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
           <van-list
             v-model:loading="loading"
             :finished="finished"
             finished-text="没有更多了"
-            @load="onLoad"
+            @load="getSiteList"
           >
             <van-collapse v-model="activeNames">
               <van-collapse-item
                 v-for="item in list"
-                :key="item.id"
-                :title="item.name"
-                :name="item.id"
+                :key="item.site"
+                :title="item.site"
+                :name="item.site"
                 size="large"
               >
                 <div
