@@ -6,7 +6,8 @@ export const encryptDes = (message: string, key: string = "OMSIP2019") => {
     mode: cryptoJs.mode.ECB,
     padding: cryptoJs.pad.NoPadding,
   });
-  return encrypted.ciphertext.toString(cryptoJs.enc.Base64);
+  // cryptoJs.enc.Base64
+  return encrypted.ciphertext.toString();
 };
 //DES解密
 export const decryptDes = (ciphertext: string, key: string = "OMSIP2019") => {
@@ -23,4 +24,14 @@ export const decryptDes = (ciphertext: string, key: string = "OMSIP2019") => {
   );
   const result_value = decrypted.toString(cryptoJs.enc.Utf8);
   return result_value;
+};
+
+export const encodeUserInfo = (val: string) => {
+  const res = encryptDes(val);
+  return btoa(res);
+};
+
+export const decodeUserInfo = (val: string) => {
+  const res = atob(val);
+  return decryptDes(res);
 };
