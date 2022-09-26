@@ -19,8 +19,8 @@ const previewImg = (index: number) => {
     startIndex: index,
   });
 };
-// 非完成状态获取实时地址
-type !== "done" && getLocation();
+// 非完成状态且地址为空时，获取实时地址
+type !== "done" && detailStore.locationName && getLocation();
 </script>
 
 <template>
