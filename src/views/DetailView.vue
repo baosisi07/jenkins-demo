@@ -9,15 +9,18 @@ const detailStore = useDetailStore();
 const id = route.query.id;
 const type = route.query.type;
 console.log(id, type);
-
 let isShow = ref(false);
-const images = ["https://unpkg.com/@vant/assets/apple-1.jpeg"];
-const onClickLeft = () => history.back();
-const previewImg = () => {
-  isShow.value = true;
-};
+detailStore.getDetailById(`${id}`);
 
-getLocation();
+const onClickLeft = () => history.back();
+const previewImg = (index: number) => {
+  isShow.value = true;
+  detailStore.$patch({
+    startIndex: index,
+  });
+};
+// 非完成状态获取实时地址
+type !== "done" && getLocation();
 </script>
 
 <template>
@@ -33,25 +36,29 @@ getLocation();
         size="large"
         :label="item.label"
       />
-      <van-cell class="image-cell">
+      <van-cell
+        v-for="(item, i) in detailStore.subTasks"
+        :key="i"
+        class="image-cell"
+      >
         <template #title>
-          <h3 class="photo">CEMS设备参数界面对比照片1</h3>
+          <h3 class="photo">{{ item.detailtitle }}</h3>
         </template>
         <template #label>
           <van-divider></van-divider>
           <div class="photo-content">
             <h4>拍摄照片</h4>
             <van-image
-              @click="previewImg"
+              @click="previewImg(i)"
               width="6rem"
               height="6rem"
               fit="cover"
               position="center"
-              :src="images[0]"
+              :src="item.detaildpath"
             />
           </div>
           <van-divider></van-divider>
-          <p class="photo-desc">图片描述信息</p>
+          <p class="photo-desc">{{ item.detaildesc }}</p>
         </template>
       </van-cell>
       <van-cell :label="detailStore.locationName" class="location-cell">
@@ -65,7 +72,7 @@ getLocation();
         </template>
       </van-cell>
     </van-cell-group>
-    <van-row justify="center" class="btn-wrapper">
+    <van-row v-if="type === 'delayed'" justify="center" class="btn-wrapper">
       <van-col span="8">
         <van-button class="custom-btn" block color="#169186">提交</van-button>
       </van-col>
@@ -73,19 +80,26 @@ getLocation();
         <van-button class="custom-btn" color="#FFB12A" block>转派</van-button>
       </van-col>
     </van-row>
-    <van-row justify="center" class="btn-wrapper">
+    <van-row v-else-if="type === 'resign'" justify="center" class="btn-wrapper">
       <van-col span="14">
         <van-button class="custom-btn" color="#FFB12A" block>指派</van-button>
       </van-col>
     </van-row>
-    <van-row justify="center" class="btn-wrapper">
+    <van-row
+      v-else-if="type === 'unaudited'"
+      justify="center"
+      class="btn-wrapper"
+    >
       <van-col span="14">
         <van-button class="custom-btn" color="#FFB12A" block>审核</van-button>
       </van-col>
     </van-row>
     <!-- 自定义预览 -->
-    <preview-imgs :isShow="isShow" :images="images"></preview-imgs>
-    <!-- <img class="demo" src="../assets/WechatIMG223.jpeg" alt="" /> -->
+    <preview-imgs
+      :isShow="isShow"
+      :images="detailStore.images"
+      :startPosition="detailStore.startIndex"
+    ></preview-imgs>
   </div>
 </template>
 
