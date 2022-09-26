@@ -1,55 +1,45 @@
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, watch, watchEffect } from "vue";
+import type { Ref } from "vue";
 import { useHomeStore } from "../stores/taskList";
+import type { Item } from "../stores/taskList";
 import { useRouter } from "vue-router";
-import api from "../http/api";
-
-interface subItem {
-  id: number;
-  type: number;
-  title: string;
-  site: string;
-  excutor: string;
-  endTime: string;
-}
-interface Item {
-  siteid: number;
-  site: string;
-  subList: subItem[];
-}
 
 const router = useRouter();
 const homeStore = useHomeStore();
-const active = ref(0);
-const activeNames = ref(["1"]);
-let list: Item[] = reactive([]);
-const loading = ref(false);
-const finished = ref(false);
-const refreshing = ref(false);
-
+const currentList: Ref<Item[]> = ref([]);
 const getSiteList = async (type: string = "todo") => {
-  await api.task.getTaskList({ type });
-  if (refreshing.value) {
-    list = [];
-    refreshing.value = false;
-  }
-
-  loading.value = false;
-  // 因为没有分页
-  finished.value = true;
+  homeStore.getSiteList(type);
 };
 const switchList = (name: string, title: string) => {
   console.log(name, title);
-  getSiteList(name);
+  homeStore.getSiteList(name);
 };
+const collapseSwitch = async (name: string) => {
+  console.log(name);
+  // await api.task.getTaskList({ siteid: name, type: activeType.value });
+};
+watchEffect(() => {
+  currentList.value = homeStore.getCurrentList(homeStore.activeType);
+  console.log(currentList.value);
+});
+watch(
+  () => homeStore.activeSite,
+  async (newVal, oldVal) => {
+    if (newVal && newVal !== oldVal) {
+      homeStore.getTaskList({ siteid: newVal });
+    }
+  }
+);
 const onRefresh = () => {
-  // 清空列表数据
-  finished.value = false;
-
-  // 重新加载数据
-  // 将 loading 设置为 true，表示处于加载状态
-  loading.value = true;
-  getSiteList();
+  homeStore.$patch((state) => {
+    // 清空列表数据
+    state.finished = false;
+    // 重新加载数据
+    // 将 loading 设置为 true，表示处于加载状态
+    state.loading = true;
+  });
+  homeStore.getSiteList();
 };
 
 const toDetail = (item: any) => {
@@ -74,7 +64,7 @@ const createTask = () => {
     </van-nav-bar>
     <!-- scrollspy -->
     <van-tabs
-      v-model:active="active"
+      v-model:active="homeStore.activeType"
       swipeable
       @change="switchList"
       color="#fff"
@@ -89,18 +79,22 @@ const createTask = () => {
         :title="item.title"
         :name="item.name"
       >
-        <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
+        <van-pull-refresh v-model="homeStore.refreshing" @refresh="onRefresh">
           <van-list
-            v-model:loading="loading"
-            :finished="finished"
+            v-model:loading="homeStore.loading"
+            :finished="homeStore.finished"
             finished-text="没有更多了"
             @load="getSiteList"
           >
-            <van-collapse v-model="activeNames">
+            <van-collapse
+              v-model="homeStore.activeSite"
+              accordion
+              @change="collapseSwitch"
+            >
               <van-collapse-item
-                v-for="item in list"
+                v-for="item in currentList"
                 :key="item.site"
-                :title="item.site"
+                :title="item.sitename"
                 :name="item.site"
                 size="large"
               >
@@ -112,8 +106,8 @@ const createTask = () => {
                 >
                   <h3 class="task-subitem-title">{{ s.title }}</h3>
                   <p>站点：{{ s.site }}</p>
-                  <p>执行人：{{ s.excutor }}</p>
-                  <p>结束时间：{{ s.endTime }}</p>
+                  <p>执行人：{{ s.duty }}</p>
+                  <p>结束时间：{{ s.endtime }}</p>
                   <van-divider v-if="i !== item.subList.length - 1">
                   </van-divider>
                 </div>

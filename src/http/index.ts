@@ -96,13 +96,12 @@ const removePending = (config: AxiosRequestConfig) => {
 const instance = axios.create({
   headers: {
     "Content-Type": "application/json;charset=UTF-8",
-    "Access-Control-Allow-Origin-Type": "*",
   },
   // 请求时长
   timeout: 1000 * 30,
   baseURL: import.meta.env.VITE_API_BASE,
   // 表示跨域请求时是否需要使用凭证
-  withCredentials: false,
+  // withCredentials: false,
 });
 
 /**

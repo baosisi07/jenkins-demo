@@ -9,21 +9,29 @@ interface TaskParams {
 }
 class api {
   public static task = {
-    getTaskList: (params: TaskParams) => {
+    getSiteList: async ({ type }: TaskParams): Promise<any> => {
       userInfo = userInfoStore();
-      return Request.post("/taskservice.getsite", {
-        ...params,
+      return await Request.post("/taskservice.getsite", {
+        type,
         ...userInfo.userParams,
       });
     },
-    getTaskDetail: ({ taskid }: TaskParams) => {
+    getTaskList: ({ siteid, type }: TaskParams): any => {
+      userInfo = userInfoStore();
+      return Request.post("/taskservice.gettasklistbysite", {
+        siteid,
+        type,
+        ...userInfo.userParams,
+      });
+    },
+    getTaskDetail: ({ taskid }: TaskParams): any => {
       userInfo = userInfoStore();
       return Request.post("/taskservice.getdetail", {
         taskid,
         ...userInfo.userParams,
       });
     },
-    submitTask: ({ taskid, location, path }: TaskParams) => {
+    submitTask: ({ taskid, location, path }: TaskParams): any => {
       userInfo = userInfoStore();
       return Request.post("/taskservice.submittask", {
         taskid,
@@ -32,14 +40,14 @@ class api {
         ...userInfo.userParams,
       });
     },
-    submitDetail: ({ taskdetailid }: TaskParams) => {
+    submitDetail: ({ taskdetailid }: TaskParams): any => {
       userInfo = userInfoStore();
       return Request.post("/taskservice.submitdetail", {
         taskdetailid,
         ...userInfo.userParams,
       });
     },
-    submitNote: ({ taskid, note }: TaskParams) => {
+    submitNote: ({ taskid, note }: TaskParams): any => {
       userInfo = userInfoStore();
       return Request.post("/taskservice.submitnote", {
         taskid,
@@ -47,7 +55,7 @@ class api {
         ...userInfo.userParams,
       });
     },
-    resignTask: ({ taskid }: TaskParams) => {
+    resignTask: ({ taskid }: TaskParams): any => {
       userInfo = userInfoStore();
       return Request.post("/taskservice.resigntask", {
         taskid,
@@ -55,7 +63,7 @@ class api {
       });
     },
 
-    assignTask: ({ taskid, duty }: TaskParams) => {
+    assignTask: ({ taskid, duty }: TaskParams): any => {
       userInfo = userInfoStore();
       return Request.post("/taskservice.assigntask", {
         taskid,
@@ -63,7 +71,7 @@ class api {
         ...userInfo.userParams,
       });
     },
-    auditTask: ({ taskid, reason, audit }: TaskParams) => {
+    auditTask: ({ taskid, reason, audit }: TaskParams): any => {
       userInfo = userInfoStore();
       return Request.post("/taskservice.audittask", {
         taskid,
@@ -73,7 +81,7 @@ class api {
       });
     },
 
-    rollbackTask: ({ taskid, rollbackreason }: TaskParams) => {
+    rollbackTask: ({ taskid, rollbackreason }: TaskParams): any => {
       userInfo = userInfoStore();
       return Request.post("/taskservice.rollbacktask", {
         taskid,

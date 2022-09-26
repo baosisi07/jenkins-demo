@@ -6,14 +6,16 @@ export const userInfoStore = defineStore("create", {
     isLoggedIn: true,
     loginInfo: {
       name: "admin",
-      password: "123456",
+      password: "admin2",
     },
   }),
   getters: {
     userParams: (state) => {
       return {
-        name: encodeUserInfo(state.loginInfo.name),
-        password: encodeUserInfo(state.loginInfo.password),
+        name: "MEenL9FKdYw=",
+        password: "QzMvrGAX6i0=",
+        // name: encodeUserInfo(state.loginInfo.name),
+        // password: encodeUserInfo(state.loginInfo.password),
       };
     },
   },
