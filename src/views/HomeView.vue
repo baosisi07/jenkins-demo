@@ -8,11 +8,15 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 const homeStore = useHomeStore();
 const currentList: Ref<Item[]> = ref([]);
+const currentLoading = ref(false);
+const currentFinished = ref(false);
+const currentRefreshing = ref(false);
 const getSiteList = async (type: string = "todo") => {
   homeStore.getSiteList(type);
 };
 const switchList = (name: string, title: string) => {
   console.log(name, title);
+  homeStore.setListOption({ type: name, itemname: "loading", val: true });
   homeStore.getSiteList(name);
 };
 const collapseSwitch = async (name: string) => {
@@ -20,7 +24,12 @@ const collapseSwitch = async (name: string) => {
   // await api.task.getTaskList({ siteid: name, type: activeType.value });
 };
 watchEffect(() => {
-  currentList.value = homeStore.getCurrentList(homeStore.activeType);
+  const { list, loading, refreshing, finished } =
+    homeStore.getCurrentListOption(homeStore.activeType);
+  currentList.value = list;
+  currentLoading.value = loading;
+  currentRefreshing.value = refreshing;
+  currentFinished.value = finished;
   console.log(currentList.value);
 });
 watch(
@@ -32,12 +41,15 @@ watch(
   }
 );
 const onRefresh = () => {
-  homeStore.$patch((state) => {
-    // 清空列表数据
-    state.finished = false;
-    // 重新加载数据
-    // 将 loading 设置为 true，表示处于加载状态
-    state.loading = true;
+  homeStore.setListOption({
+    type: homeStore.activeType,
+    itemname: "finished",
+    val: false,
+  });
+  homeStore.setListOption({
+    type: homeStore.activeType,
+    itemname: "loading",
+    val: false,
   });
   homeStore.getSiteList();
 };
@@ -79,10 +91,10 @@ const createTask = () => {
         :title="item.title"
         :name="item.name"
       >
-        <van-pull-refresh v-model="homeStore.refreshing" @refresh="onRefresh">
+        <van-pull-refresh v-model="currentRefreshing" @refresh="onRefresh">
           <van-list
-            v-model:loading="homeStore.loading"
-            :finished="homeStore.finished"
+            v-model:loading="currentLoading"
+            :finished="currentFinished"
             finished-text="没有更多了"
             @load="getSiteList"
           >

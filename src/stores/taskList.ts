@@ -34,97 +34,180 @@ export const useHomeStore = defineStore("home", {
       ],
       activeType: "todo",
       activeSite: "",
-      list: {
-        todoList: [],
+
+      todoList: {
+        list: [] as Item[],
+        loading: false,
+        finished: false,
+        refreshing: false,
       },
-      todoList: [] as Item[],
-      doneList: [] as Item[],
-      delayedList: [] as Item[],
-      tempList: [] as Item[],
-      resignList: [] as Item[],
-      unauditedList: [] as Item[],
-      loading: false,
-      finished: false,
-      refreshing: false,
+      doneList: {
+        list: [] as Item[],
+        loading: false,
+        finished: false,
+        refreshing: false,
+      },
+      delayedList: {
+        list: [] as Item[],
+        loading: false,
+        finished: false,
+        refreshing: false,
+      },
+      tempList: {
+        list: [] as Item[],
+        loading: false,
+        finished: false,
+        refreshing: false,
+      },
+      resignList: {
+        list: [] as Item[],
+        loading: false,
+        finished: false,
+        refreshing: false,
+      },
+      unauditedList: {
+        list: [] as Item[],
+        loading: false,
+        finished: false,
+        refreshing: false,
+      },
     };
   },
   getters: {
-    getCurrentList: (state) => {
+    getCurrentListOption: (state) => {
       return (type: string) => {
-        let list: Item[] = [];
+        let listOption = null;
         switch (type) {
           case "todo":
-            list = state.todoList;
+            listOption = state.todoList;
             break;
           case "done":
-            list = state.doneList;
+            listOption = state.doneList;
             break;
           case "delayed":
-            list = state.delayedList;
+            listOption = state.delayedList;
             break;
           case "temp":
-            list = state.tempList;
+            listOption = state.tempList;
             break;
           case "resign":
-            list = state.resignList;
+            listOption = state.resignList;
             break;
           case "unaudited":
-            list = state.unauditedList;
+            listOption = state.unauditedList;
             break;
           default:
-            list = state.todoList;
+            listOption = state.todoList;
             break;
         }
-        return list;
+        return listOption;
       };
     },
   },
   actions: {
-    setList(type: string, list: Item[]) {
+    setListOption({ type, itemname, val }: any) {
+      // itemname: list, loading, finished, refreshing
+
       switch (type) {
         case "todo":
-          this.todoList = list;
+          if (itemname === "list") {
+            this.todoList.list = val;
+          } else if (itemname === "loading") {
+            this.todoList.loading = val;
+          } else if (itemname === "finished") {
+            this.todoList.finished = val;
+          } else if (itemname === "refreshing") {
+            this.todoList.refreshing = val;
+          }
           break;
         case "done":
-          this.doneList = list;
+          if (itemname === "list") {
+            this.doneList.list = val;
+          } else if (itemname === "loading") {
+            this.doneList.loading = val;
+          } else if (itemname === "finished") {
+            this.doneList.finished = val;
+          } else if (itemname === "refreshing") {
+            this.doneList.refreshing = val;
+          }
           break;
         case "delayed":
-          this.delayedList = list;
+          if (itemname === "list") {
+            this.delayedList.list = val;
+          } else if (itemname === "loading") {
+            this.delayedList.loading = val;
+          } else if (itemname === "finished") {
+            this.delayedList.finished = val;
+          } else if (itemname === "refreshing") {
+            this.delayedList.refreshing = val;
+          }
           break;
         case "temp":
-          this.tempList = list;
+          if (itemname === "list") {
+            this.tempList.list = val;
+          } else if (itemname === "loading") {
+            this.tempList.loading = val;
+          } else if (itemname === "finished") {
+            this.tempList.finished = val;
+          } else if (itemname === "refreshing") {
+            this.tempList.refreshing = val;
+          }
           break;
         case "resign":
-          this.resignList = list;
+          if (itemname === "list") {
+            this.resignList.list = val;
+          } else if (itemname === "loading") {
+            this.resignList.loading = val;
+          } else if (itemname === "finished") {
+            this.resignList.finished = val;
+          } else if (itemname === "refreshing") {
+            this.resignList.refreshing = val;
+          }
           break;
         case "unaudited":
-          this.unauditedList = list;
+          if (itemname === "list") {
+            this.unauditedList.list = val;
+          } else if (itemname === "loading") {
+            this.unauditedList.loading = val;
+          } else if (itemname === "finished") {
+            this.unauditedList.finished = val;
+          } else if (itemname === "refreshing") {
+            this.unauditedList.refreshing = val;
+          }
           break;
         default:
-          this.todoList = list;
+          if (itemname === "list") {
+            this.todoList.list = val;
+          } else if (itemname === "loading") {
+            this.todoList.loading = val;
+          } else if (itemname === "finished") {
+            this.todoList.finished = val;
+          } else if (itemname === "refreshing") {
+            this.todoList.refreshing = val;
+          }
           break;
       }
     },
     async getSiteList(type: string = "todo") {
-      let list: Item[] = this.getCurrentList(type);
+      let list: Item[] = this.getCurrentListOption(type).list;
       const { data: siteList, code } = await api.task.getSiteList({ type });
       if (+code === 0) {
-        if (this.refreshing) {
+        if (this.getCurrentListOption(type).refreshing) {
           list = [];
-          this.setList(type, []);
-          this.refreshing = false;
+          this.setListOption({ type, itemname: "list", val: [] });
+          this.setListOption({ type, itemname: "refreshing", val: false });
         }
-        list = siteList.slice(0, 10);
-        this.setList(type, list);
+        list = siteList;
+        this.setListOption({ type, itemname: "list", val: list.slice(0, 20) });
         console.log(list, this.todoList);
         // 默认展开第一个面板
         if (siteList.length > 0) {
           this.activeSite = siteList[0].site;
         }
       }
-      this.loading = false;
+      this.setListOption({ type, itemname: "loading", val: false });
       // 因为没有分页
-      this.finished = true;
+      this.setListOption({ type, itemname: "finished", val: true });
     },
     async getTaskList({ siteid, type }: any) {
       const taskType = type || this.activeType;
@@ -132,7 +215,7 @@ export const useHomeStore = defineStore("home", {
         siteid,
         type: taskType,
       });
-      const currentList = this.getCurrentList(type);
+      const currentList = this.getCurrentListOption(type).list;
       if (+code === 0) {
         for (let i = 0; i < currentList.length; i++) {
           if (currentList[i].site === siteid) {
