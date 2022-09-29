@@ -28,6 +28,7 @@ const rotateImg = () => {
   console.log(currentImg.value.style.transform);
 };
 const switchImg = (index: number) => {
+  deg.value = 0;
   const parentEl = document.querySelector(".user-upload-img");
   const img = parentEl?.querySelectorAll("img")[index] as Record<string, any>;
   currentImg.value = img;
