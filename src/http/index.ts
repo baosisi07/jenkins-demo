@@ -120,6 +120,7 @@ instance.interceptors.request.use(
         cancel: c,
       });
     });
+
     // const token = store.state.token;
     // localStorage.setItem('token', token);
 

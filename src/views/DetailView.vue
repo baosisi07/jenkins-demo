@@ -10,6 +10,8 @@ const id = route.query.id;
 const type = route.query.type;
 console.log(id, type);
 let isShow = ref(false);
+let isShowGetLocation = ref(false);
+let isReadOnly = ref(false);
 detailStore.getDetailById(`${id}`);
 
 const onClickLeft = () => history.back();
@@ -20,7 +22,11 @@ const previewImg = (index: number) => {
   });
 };
 // 非完成状态且地址为空时，获取实时地址
-type !== "done" && detailStore.locationName && getLocation();
+if (type !== "done" && !detailStore.locationName) {
+  console.log("location");
+  isShowGetLocation.value = true;
+  getLocation();
+}
 </script>
 
 <template>
@@ -36,34 +42,75 @@ type !== "done" && detailStore.locationName && getLocation();
         size="large"
         :label="item.label"
       />
-      <van-cell
-        v-for="(item, i) in detailStore.subTasks"
-        :key="i"
-        class="image-cell"
-      >
-        <template #title>
-          <h3 class="photo">{{ item.detailtitle }}</h3>
-        </template>
-        <template #label>
-          <van-divider></van-divider>
-          <div class="photo-content">
-            <h4>拍摄照片</h4>
-            <van-image
-              @click="previewImg(i)"
-              width="6rem"
-              height="6rem"
-              fit="cover"
-              position="center"
-              :src="item.detaildpath"
-            />
-          </div>
-          <van-divider></van-divider>
-          <p class="photo-desc">{{ item.detaildesc }}</p>
-        </template>
-      </van-cell>
+      <!-- 仅显示 -->
+      <template v-if="isReadOnly">
+        <van-cell
+          v-for="(item, i) in detailStore.subTasks"
+          :key="i"
+          class="image-cell"
+        >
+          <template #title>
+            <h3 class="photo">{{ item.detailtitle }}</h3>
+          </template>
+          <template #label>
+            <van-divider></van-divider>
+            <div class="photo-content">
+              <h4>{{ item.detaildesc }}</h4>
+              <van-image
+                @click="previewImg(i)"
+                width="6rem"
+                height="6rem"
+                fit="cover"
+                position="center"
+                :src="item.detaildpath"
+              />
+            </div>
+          </template>
+        </van-cell>
+      </template>
+      <!-- 可编辑 -->
+      <template v-else>
+        <van-cell
+          v-for="(item, i) in detailStore.subTasks"
+          :key="i"
+          class="image-cell"
+        >
+          <template #title>
+            <h3 class="photo">{{ item.detailtitle }}</h3>
+          </template>
+          <template #label>
+            <van-divider></van-divider>
+            <div class="photo-content">
+              <h4>拍摄照片</h4>
+
+              <van-uploader
+                v-model="item.fileList"
+                preview-size="6rem"
+                :max-count="1"
+                :before-delete="detailStore.beforeDel(i)"
+                :after-read="detailStore.afterRead(i)"
+                :before-read="detailStore.beforeRead(i)"
+                result-type="file"
+              />
+            </div>
+            <van-divider></van-divider>
+            <van-field
+              class="desc-input"
+              v-model="item.detaildesc"
+              center
+              clearable
+              placeholder="请输入描述信息"
+            >
+              <template #button>
+                <van-button size="small" type="primary">提交</van-button>
+              </template>
+            </van-field>
+          </template>
+        </van-cell>
+      </template>
       <van-cell :label="detailStore.locationName" class="location-cell">
         <template #title> <h3 class="location">当前定位地点</h3> </template>
-        <template #right-icon>
+        <template v-if="isShowGetLocation" #right-icon>
           <van-icon
             name="location"
             class="location-icon"
@@ -133,5 +180,8 @@ type !== "done" && detailStore.locationName && getLocation();
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.desc-input {
+  padding: 0;
 }
 </style>

@@ -89,6 +89,21 @@ class api {
         ...userInfo.userParams,
       });
     },
+    fileUpload: ({ file, taskdetailid }: TaskParams): any => {
+      userInfo = userInfoStore();
+      const param = new FormData();
+      param.append("file", file);
+      console.log(param.get("file"));
+      return Request.post("/taskservice.submitdetail", param, {
+        headers: {
+          name: userInfo.userParams.name,
+          password: userInfo.userParams.password,
+          taskdetailid: taskdetailid,
+          "Content-Type":
+            "multipart/form-data;boundary=c58e2b35-e270-4c6e-919d-13bab6968979",
+        },
+      });
+    },
   };
 }
 export default api;

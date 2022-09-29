@@ -20,10 +20,10 @@ export class Request {
     });
   };
 
-  static post = (url: string, params?: any) => {
+  static post = (url: string, params?: any, config?: any) => {
     return new Promise((resolve, reject) => {
       axios
-        .post(url, JSON.stringify(params))
+        .post(url, JSON.stringify(params), config)
         .then((res) => {
           resolve(res.data);
         })

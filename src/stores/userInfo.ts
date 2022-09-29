@@ -12,8 +12,8 @@ export const userInfoStore = defineStore("create", {
   getters: {
     userParams: (state) => {
       return {
-        name: "MEenL9FKdYw=",
-        password: "QzMvrGAX6i0=",
+        name: "utaLGxlOfh4=",
+        password: "FrgEcLSyBgU=",
         // name: encodeUserInfo(state.loginInfo.name),
         // password: encodeUserInfo(state.loginInfo.password),
       };

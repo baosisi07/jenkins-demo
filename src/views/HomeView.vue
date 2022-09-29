@@ -57,7 +57,7 @@ const onRefresh = () => {
 const toDetail = (item: any) => {
   router.push({
     name: `detail`,
-    query: { id: item.id, type: item.type },
+    query: { id: item.id, type: homeStore.activeType },
   });
 };
 const createTask = () => {
