@@ -90,7 +90,6 @@ if (type !== "done" && !detailStore.locationName) {
                 :before-delete="detailStore.beforeDel(i)"
                 :after-read="detailStore.afterRead(i)"
                 :before-read="detailStore.beforeRead(i)"
-                result-type="file"
               />
             </div>
             <van-divider></van-divider>

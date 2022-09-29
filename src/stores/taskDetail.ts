@@ -53,26 +53,31 @@ export const useDetailStore = defineStore("detail", {
     beforeRead(index: number) {
       const that = this;
       return async function (file: any, detail: any) {
-        console.log("before read", index, file, detail);
-        Toast.loading({
-          message: "上传中...",
-          forbidClick: true,
-        });
+        console.log("before read", index, file.file, detail);
+      };
+    },
+    afterRead(index: number) {
+      const that = this;
+
+      return async function (file: any, detail: any) {
+        const fileItem = that.subTasks[index].fileList;
+        console.log("after read", file.file);
+        fileItem.status = "uploading";
+        fileItem.message = "上传中...";
         const { code, message, path } = await api.task.fileUpload({
           file: file,
           taskdetailid: that.subTasks[index].detailid,
         });
         Toast(message);
         if (code === 0) {
+          fileItem.status = "done";
+          fileItem.message = "上传成功";
           const url = import.meta.env.VITE_IMG_PRE_PATH + path;
           that.setFileItemImg(index, url);
+        } else {
+          fileItem.status = "failed";
+          fileItem.message = "上传失败";
         }
-      };
-    },
-    afterRead(index: number) {
-      const that = this;
-      return async function (file: any, detail: any) {
-        console.log("after read", file.file);
       };
     },
     async getDetailById(id: string) {
