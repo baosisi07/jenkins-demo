@@ -40,13 +40,7 @@ class api {
         ...userInfo.userParams,
       });
     },
-    submitDetail: ({ taskdetailid }: TaskParams): any => {
-      userInfo = userInfoStore();
-      return Request.post("/taskservice.submitdetail", {
-        taskdetailid,
-        ...userInfo.userParams,
-      });
-    },
+
     submitNote: ({ taskid, note }: TaskParams): any => {
       userInfo = userInfoStore();
       return Request.post("/taskservice.submitnote", {
@@ -89,7 +83,8 @@ class api {
         ...userInfo.userParams,
       });
     },
-    fileUpload: ({ file, taskdetailid }: TaskParams): any => {
+
+    submitdetail: ({ file, taskdetailid }: TaskParams): any => {
       userInfo = userInfoStore();
       const param = new FormData();
       param.append("file", file.file);

@@ -55,7 +55,7 @@ if (type !== "done" && !detailStore.locationName) {
           <template #label>
             <van-divider></van-divider>
             <div class="photo-content">
-              <h4>{{ item.detaildesc }}</h4>
+              <h4>{{ item.note }}</h4>
               <van-image
                 @click="previewImg(i)"
                 width="6rem"
@@ -90,18 +90,24 @@ if (type !== "done" && !detailStore.locationName) {
                 :before-delete="detailStore.beforeDel(i)"
                 :after-read="detailStore.afterRead(i)"
                 :before-read="detailStore.beforeRead(i)"
+                result-type="file"
               />
             </div>
             <van-divider></van-divider>
             <van-field
               class="desc-input"
-              v-model="item.detaildesc"
+              v-model="item.note"
               center
               clearable
               placeholder="请输入描述信息"
             >
               <template #button>
-                <van-button size="small" type="primary">提交</van-button>
+                <van-button
+                  size="small"
+                  @click="detailStore.submitNote(i, item.note)"
+                  type="primary"
+                  >提交</van-button
+                >
               </template>
             </van-field>
           </template>

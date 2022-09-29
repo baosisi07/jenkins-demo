@@ -28,6 +28,18 @@ export const useDetailStore = defineStore("detail", {
     startIndex: 0,
   }),
   actions: {
+    async submitNote(index: number, note: string) {
+      const { code, message, data } = await api.task.submitNote({
+        taskid: this.subTasks[index].detailid,
+        note,
+      });
+      if (+code === 0) {
+        Toast("已提交");
+        this.subTasks[index].note = note;
+      } else {
+        Toast.fail("提交失败");
+      }
+    },
     beforeDel(index: number) {
       const that = this;
       return function (file: any, detail: any) {
@@ -60,16 +72,16 @@ export const useDetailStore = defineStore("detail", {
       const that = this;
 
       return async function (file: any, detail: any) {
-        const fileItem = that.subTasks[index].fileList;
+        const fileItem = that.subTasks[index].fileList[0];
         console.log("after read", file.file);
         fileItem.status = "uploading";
         fileItem.message = "上传中...";
-        const { code, message, path } = await api.task.fileUpload({
+        const { code, message, path } = await api.task.submitdetail({
           file: file,
           taskdetailid: that.subTasks[index].detailid,
         });
         Toast(message);
-        if (code === 0) {
+        if (+code === 0) {
           fileItem.status = "done";
           fileItem.message = "上传成功";
           const url = import.meta.env.VITE_IMG_PRE_PATH + path;
