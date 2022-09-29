@@ -21,6 +21,7 @@ const previewImg = (index: number) => {
     startIndex: index,
   });
 };
+
 // 非完成状态且地址为空时，获取实时地址
 if (type !== "done" && !detailStore.locationName) {
   console.log("location");
@@ -91,6 +92,8 @@ if (type !== "done" && !detailStore.locationName) {
                 :after-read="detailStore.afterRead(i)"
                 :before-read="detailStore.beforeRead(i)"
                 result-type="file"
+                :preview-full-image="false"
+                @click-preview="previewImg(i)"
               />
             </div>
             <van-divider></van-divider>
@@ -151,6 +154,7 @@ if (type !== "done" && !detailStore.locationName) {
       :isShow="isShow"
       :images="detailStore.images"
       :startPosition="detailStore.startIndex"
+      showIndex
     ></preview-imgs>
   </div>
 </template>
