@@ -8,6 +8,7 @@ interface TaskParams {
   [propname: string]: any;
 }
 class api {
+  public static config = {};
   public static task = {
     getSiteList: async ({ type }: TaskParams): Promise<any> => {
       userInfo = userInfoStore();

@@ -14,9 +14,32 @@ const type = route.query.type;
 console.log(id, type);
 let isShow = ref(false);
 let isShowDialog = ref(false);
+let isShowPersonList = ref(false);
 let isShowGetLocation = ref(false);
 let isReadOnly = ref(false);
+let customFieldName = {
+  text: "lowername",
+};
 detailStore.getDetailById(`${id}`);
+
+const onConfirm = async (value: any, index: number) => {
+  const duty = userStore.loginInfo.lowers[index].lowerid;
+  const { code } = await detailStore.assignTask({ taskid: id, duty });
+  if (+code === 0) {
+    Toast("指派成功");
+    isShowPersonList.value = false;
+  }
+};
+
+const onCancel = () => {
+  isShowPersonList.value = false;
+};
+const assignTask = () => {
+  isShowPersonList.value = true;
+};
+const auditTask = () => {
+  
+}
 
 const onClickLeft = () => history.back();
 const cancel = () => {
@@ -150,6 +173,7 @@ if (type !== "done" && !detailStore.locationName) {
         </template>
       </van-cell>
     </van-cell-group>
+    <!-- 完成 -->
     <van-row
       v-if="type === 'done' && userStore.loginInfo.backflag == '1'"
       justify="center"
@@ -165,32 +189,45 @@ if (type !== "done" && !detailStore.locationName) {
         >
       </van-col>
     </van-row>
+    <!-- 超时 -->
     <van-row
       v-else-if="type === 'delayed'"
       justify="center"
       class="btn-wrapper"
     >
-      <van-col span="8">
-        <van-button class="custom-btn" block color="#169186">提交</van-button>
-      </van-col>
-      <van-col span="8" offset="2">
+      <van-col span="14">
         <van-button class="custom-btn" color="#FFB12A" block>转派</van-button>
       </van-col>
     </van-row>
-    <van-row v-else-if="type === 'resign'" justify="center" class="btn-wrapper">
-      <van-col span="14">
-        <van-button class="custom-btn" color="#FFB12A" block>指派</van-button>
-      </van-col>
-    </van-row>
+    <!-- 转派 -->
     <van-row
-      v-else-if="type === 'unaudited'"
+      v-else-if="type === 'resign' && userStore.loginInfo.assignable == '1'"
       justify="center"
       class="btn-wrapper"
     >
       <van-col span="14">
-        <van-button class="custom-btn" color="#FFB12A" block>审核</van-button>
+        <van-button class="custom-btn" color="#FFB12A" @click="assignTask" block
+          >指派</van-button
+        >
       </van-col>
     </van-row>
+    <!-- 待审核 -->
+    <van-row
+      v-else-if="type === 'unaudited' && userStore.loginInfo.assignable == '1'"
+      justify="center"
+      class="btn-wrapper"
+    >
+      <van-col span="14">
+        <van-button class="custom-btn" color="#FFB12A" @click="auditTask" block>审核</van-button>
+      </van-col>
+    </van-row>
+    <!-- 其他 -->
+    <van-row v-else justify="center" class="btn-wrapper">
+      <van-col span="14">
+        <van-button class="custom-btn" color="#FFB12A" block>提交</van-button>
+      </van-col>
+    </van-row>
+
     <!-- 自定义预览 -->
     <preview-imgs
       :isShow="isShow"
@@ -198,6 +235,7 @@ if (type !== "done" && !detailStore.locationName) {
       :startPosition="detailStore.startIndex"
       showIndex
     ></preview-imgs>
+    <!-- 回退弹框 -->
     <input-dialog
       :isShow="isShowDialog"
       :cancel="cancel"
@@ -205,6 +243,21 @@ if (type !== "done" && !detailStore.locationName) {
       title="回退"
       label="请输入回退理由"
     ></input-dialog>
+    <!-- 选择弹框 -->
+    <van-popup
+      v-model:show="isShowPersonList"
+      position="bottom"
+      :style="{ height: '50%' }"
+    >
+      <van-picker
+        title="标题"
+        :columns="userStore.loginInfo.lowers"
+        :columns-field-names="customFieldName"
+        @confirm="onConfirm"
+        @cancel="onCancel"
+        @change="onChange"
+      />
+    </van-popup>
   </div>
 </template>
 

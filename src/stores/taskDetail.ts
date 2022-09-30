@@ -11,6 +11,7 @@ interface subTasksItem {
   fileList: any;
   note: string;
 }
+
 export const useDetailStore = defineStore("detail", {
   state: () => ({
     taskItems: [
@@ -26,7 +27,7 @@ export const useDetailStore = defineStore("detail", {
     locationName: "",
     subTasks: [] as subTasksItem[],
     images: [],
-    startIndex: 0,
+    startIndex: 0
   }),
   actions: {
     async submitNote(index: number, note: string) {
@@ -137,6 +138,11 @@ export const useDetailStore = defineStore("detail", {
     },
     async backTask({ taskid, rollbackreason }: any) {
       const res = await api.task.rollbackTask({ taskid, rollbackreason });
+      return res;
+    },
+  
+    async assignTask({ taskid, duty }: any) {
+      const res = await api.task.assignTask({ taskid, duty });
       return res;
     },
   },
