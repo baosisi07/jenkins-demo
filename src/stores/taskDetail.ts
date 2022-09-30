@@ -2,6 +2,7 @@ import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import api from "../http/api";
 import { Toast } from "vant";
+import "vant/es/toast/style";
 interface subTasksItem {
   detailid: string;
   detailtitle: string;
@@ -133,6 +134,10 @@ export const useDetailStore = defineStore("detail", {
           (item: subTasksItem) => item.detaildpath
         );
       }
+    },
+    async backTask({ taskid, rollbackreason }: any) {
+      const res = await api.task.rollbackTask({ taskid, rollbackreason });
+      return res;
     },
   },
 });

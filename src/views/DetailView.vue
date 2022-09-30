@@ -1,27 +1,50 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useDetailStore } from "../stores/taskDetail";
+import { userInfoStore } from "../stores/userInfo";
 import { useRoute } from "vue-router";
-
 import { getLocation } from "../utils/location";
+import { Toast } from "vant";
+
 const route = useRoute();
 const detailStore = useDetailStore();
+const userStore = userInfoStore();
 const id = route.query.id;
 const type = route.query.type;
 console.log(id, type);
 let isShow = ref(false);
+let isShowDialog = ref(false);
 let isShowGetLocation = ref(false);
 let isReadOnly = ref(false);
 detailStore.getDetailById(`${id}`);
 
 const onClickLeft = () => history.back();
+const cancel = () => {
+  isShowDialog.value = false;
+};
+
+const submit = async (text: string) => {
+  const { code } = await detailStore.backTask({
+    taskid: id,
+    rollbackreason: text,
+  });
+  if (+code === 0) {
+    Toast("回退成功");
+    isShowDialog.value = false;
+  } else {
+    Toast("操作失败");
+    return false;
+  }
+};
 const previewImg = (index: number) => {
   isShow.value = true;
   detailStore.$patch({
     startIndex: index,
   });
 };
-
+if (type === "done") {
+  isReadOnly.value = true;
+}
 // 非完成状态且地址为空时，获取实时地址
 if (type !== "done" && !detailStore.locationName) {
   console.log("location");
@@ -127,7 +150,26 @@ if (type !== "done" && !detailStore.locationName) {
         </template>
       </van-cell>
     </van-cell-group>
-    <van-row v-if="type === 'delayed'" justify="center" class="btn-wrapper">
+    <van-row
+      v-if="type === 'done' && userStore.loginInfo.backflag == '1'"
+      justify="center"
+      class="btn-wrapper"
+    >
+      <van-col span="14">
+        <van-button
+          class="custom-btn"
+          color="#FFB12A"
+          @click="isShowDialog = true"
+          block
+          >回退</van-button
+        >
+      </van-col>
+    </van-row>
+    <van-row
+      v-else-if="type === 'delayed'"
+      justify="center"
+      class="btn-wrapper"
+    >
       <van-col span="8">
         <van-button class="custom-btn" block color="#169186">提交</van-button>
       </van-col>
@@ -156,6 +198,13 @@ if (type !== "done" && !detailStore.locationName) {
       :startPosition="detailStore.startIndex"
       showIndex
     ></preview-imgs>
+    <input-dialog
+      :isShow="isShowDialog"
+      :cancel="cancel"
+      :submit="submit"
+      title="回退"
+      label="请输入回退理由"
+    ></input-dialog>
   </div>
 </template>
 

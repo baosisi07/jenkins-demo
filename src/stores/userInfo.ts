@@ -7,6 +7,8 @@ export const userInfoStore = defineStore("create", {
     loginInfo: {
       name: "admin",
       password: "admin2",
+      backflag: "1",
+      assignable: "1",
     },
   }),
   getters: {
