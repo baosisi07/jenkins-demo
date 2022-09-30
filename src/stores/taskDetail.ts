@@ -113,15 +113,19 @@ export const useDetailStore = defineStore("detail", {
         this.subTasks = data.details;
         console.log(this.subTasks);
         data.details = data.details.map((item: subTasksItem, i: number) => {
-          item.detaildpath =
-            import.meta.env.VITE_IMG_PRE_PATH + item.detaildpath;
+          item.detaildpath = item.detaildpath
+            ? import.meta.env.VITE_IMG_PRE_PATH + item.detaildpath
+            : "";
           const that = this;
-          item.fileList = [
-            {
-              url: item.detaildpath,
-              deletable: true,
-            },
-          ];
+
+          item.fileList = item.detaildpath
+            ? [
+                {
+                  url: item.detaildpath,
+                  deletable: true,
+                },
+              ]
+            : [];
 
           return item;
         });
