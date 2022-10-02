@@ -4,7 +4,7 @@ import { useDetailStore } from "../stores/taskDetail";
 import { userInfoStore } from "../stores/userInfo";
 import { useRoute } from "vue-router";
 import { getLocation } from "../utils/location";
-import { Toast } from "vant";
+import { Toast, Dialog } from "vant";
 
 const route = useRoute();
 const detailStore = useDetailStore();
@@ -83,8 +83,29 @@ const previewImg = (index: number) => {
     startIndex: index,
   });
 };
+
+const resignTask = () => {
+  Dialog.confirm({
+    title: "提示",
+    message: `是否转派 ${detailStore.taskItems[0].value} 任务`,
+    beforeClose: async function (action: string): Promise<any> {
+      if (action === "confirm") {
+        const { code } = await detailStore.resignTask({ taskid: id });
+        if (+code === 0) {
+          Toast("已转派");
+          Promise.resolve(true);
+        } else {
+          Toast("操作失败");
+          Promise.resolve(false);
+        }
+      } else {
+        return true;
+      }
+    },
+  });
+};
 // 表单只读
-if (type === "done") {
+if (type === "done" || type === "unaudited") {
   isReadOnly.value = true;
 }
 // 非完成状态且地址为空时，获取实时地址
@@ -219,14 +240,48 @@ if (type !== "done" && !detailStore.locationName) {
         >
       </van-col>
     </van-row>
+    <!-- 待办 -->
+    <van-row v-else-if="type === 'todo'" justify="center" class="btn-wrapper">
+      <template v-if="userStore.loginInfo.assignable == '1'">
+        <van-col span="8">
+          <van-button class="custom-btn" color="#169186" block>提交</van-button>
+        </van-col>
+        <van-col span="8" offset="2">
+          <van-button
+            class="custom-btn"
+            color="#FFB12A"
+            @click="resignTask"
+            block
+            >转派</van-button
+          >
+        </van-col>
+      </template>
+      <van-col span="14" v-else>
+        <van-button class="custom-btn" color="#169186" block>提交</van-button>
+      </van-col>
+    </van-row>
     <!-- 超时 -->
     <van-row
       v-else-if="type === 'delayed'"
       justify="center"
       class="btn-wrapper"
     >
-      <van-col span="14">
-        <van-button class="custom-btn" color="#FFB12A" block>转派</van-button>
+      <template v-if="userStore.loginInfo.assignable == '1'">
+        <van-col span="8">
+          <van-button class="custom-btn" color="#169186" block>提交</van-button>
+        </van-col>
+        <van-col span="8" offset="2">
+          <van-button
+            class="custom-btn"
+            color="#FFB12A"
+            @click="resignTask"
+            block
+            >转派</van-button
+          >
+        </van-col>
+      </template>
+      <van-col span="14" v-else>
+        <van-button class="custom-btn" color="#169186" block>提交</van-button>
       </van-col>
     </van-row>
     <!-- 转派 -->
@@ -262,7 +317,7 @@ if (type !== "done" && !detailStore.locationName) {
       </van-col>
     </van-row>
     <!-- 其他 -->
-    <van-row v-else justify="center" class="btn-wrapper">
+    <van-row v-else-if="type === 'temp'" justify="center" class="btn-wrapper">
       <van-col span="14">
         <van-button class="custom-btn" color="#FFB12A" block>提交</van-button>
       </van-col>

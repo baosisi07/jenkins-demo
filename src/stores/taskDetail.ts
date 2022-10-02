@@ -161,6 +161,10 @@ export const useDetailStore = defineStore("detail", {
         this.records = data;
       }
     },
+    async resignTask({ taskid }: any) {
+      const res = await api.task.resignTask({ taskid });
+      return res;
+    },
     async backTask({ taskid, rollbackreason }: any) {
       const res = await api.task.rollbackTask({ taskid, rollbackreason });
       return res;
