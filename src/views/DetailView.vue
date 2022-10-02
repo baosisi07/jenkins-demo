@@ -13,7 +13,8 @@ const id = route.query.id;
 const type = route.query.type;
 console.log(id, type);
 let isShow = ref(false);
-let isShowDialog = ref(false);
+let isShowBackDialog = ref(false);
+let isShowAuditDialog = ref(false);
 let isShowPersonList = ref(false);
 let isShowGetLocation = ref(false);
 let isReadOnly = ref(false);
@@ -34,26 +35,42 @@ const onConfirm = async (value: any, index: number) => {
 const onCancel = () => {
   isShowPersonList.value = false;
 };
-const assignTask = () => {
-  isShowPersonList.value = true;
-};
-const auditTask = () => {
-  
-}
 
 const onClickLeft = () => history.back();
-const cancel = () => {
-  isShowDialog.value = false;
-};
 
+const cancel = () => {
+  isShowBackDialog.value = false;
+};
+const cancelAudit = () => {
+  isShowAuditDialog.value = false;
+};
+const submitAudit = async (params: any) => {
+  // 不通过 理由必填
+  if (params.audit === "0" && !params.reason) {
+    Toast("请输入不通过理由");
+    return;
+  }
+  const { code } = await detailStore.auditTask({ taskid: id, ...params });
+  if (+code === 0) {
+    Toast("审核成功");
+    isShowAuditDialog.value = false;
+  } else {
+    Toast("操作失败");
+    return false;
+  }
+};
 const submit = async (text: string) => {
+  if (!text) {
+    Toast("请输入回退理由");
+    return;
+  }
   const { code } = await detailStore.backTask({
     taskid: id,
     rollbackreason: text,
   });
   if (+code === 0) {
     Toast("回退成功");
-    isShowDialog.value = false;
+    isShowBackDialog.value = false;
   } else {
     Toast("操作失败");
     return false;
@@ -183,7 +200,7 @@ if (type !== "done" && !detailStore.locationName) {
         <van-button
           class="custom-btn"
           color="#FFB12A"
-          @click="isShowDialog = true"
+          @click="isShowBackDialog = true"
           block
           >回退</van-button
         >
@@ -206,7 +223,11 @@ if (type !== "done" && !detailStore.locationName) {
       class="btn-wrapper"
     >
       <van-col span="14">
-        <van-button class="custom-btn" color="#FFB12A" @click="assignTask" block
+        <van-button
+          class="custom-btn"
+          color="#FFB12A"
+          @click="isShowPersonList = true"
+          block
           >指派</van-button
         >
       </van-col>
@@ -218,7 +239,13 @@ if (type !== "done" && !detailStore.locationName) {
       class="btn-wrapper"
     >
       <van-col span="14">
-        <van-button class="custom-btn" color="#FFB12A" @click="auditTask" block>审核</van-button>
+        <van-button
+          class="custom-btn"
+          color="#FFB12A"
+          @click="isShowAuditDialog = true"
+          block
+          >审核</van-button
+        >
       </van-col>
     </van-row>
     <!-- 其他 -->
@@ -237,11 +264,20 @@ if (type !== "done" && !detailStore.locationName) {
     ></preview-imgs>
     <!-- 回退弹框 -->
     <input-dialog
-      :isShow="isShowDialog"
+      :isShow="isShowBackDialog"
       :cancel="cancel"
       :submit="submit"
       title="回退"
       label="请输入回退理由"
+    ></input-dialog>
+    <!-- 审核弹框 -->
+    <input-dialog
+      :isShow="isShowAuditDialog"
+      :cancel="cancelAudit"
+      :submit="submitAudit"
+      type="audit"
+      title="审核意见"
+      label="请输入不通过的理由"
     ></input-dialog>
     <!-- 选择弹框 -->
     <van-popup
@@ -255,7 +291,6 @@ if (type !== "done" && !detailStore.locationName) {
         :columns-field-names="customFieldName"
         @confirm="onConfirm"
         @cancel="onCancel"
-        @change="onChange"
       />
     </van-popup>
   </div>

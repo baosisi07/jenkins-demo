@@ -145,5 +145,10 @@ export const useDetailStore = defineStore("detail", {
       const res = await api.task.assignTask({ taskid, duty });
       return res;
     },
+
+    async auditTask({ taskid, duty }: any) {
+      const res = await api.task.auditTask({ taskid, duty });
+      return res;
+    },
   },
 });

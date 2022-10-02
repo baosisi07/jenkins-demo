@@ -10,14 +10,25 @@ const props = defineProps<{
   submit: Function;
   label: string;
   title: string;
+  type: string;
 }>();
 const text = ref("");
-
+const checked = ref("1");
+const reason = ref("");
 const cancelHander = function () {
   props.cancel();
 };
-const submitForm = function () {
-  props.submit(text.value);
+
+const closeHandler = function (action: string) {
+  if (action === "confirm") {
+    if (props.type === "audit") {
+      props.submit({ audit: checked.value, reason: reason.value });
+    } else {
+      props.submit(text.value);
+    }
+  } else {
+    props.cancel();
+  }
 };
 </script>
 
@@ -28,11 +39,25 @@ const submitForm = function () {
     :title="title"
     showCancelButton
     @cancel="cancelHander"
-    @confirm="submitForm"
+    :before-close="closeHandler"
   >
     <van-cell-group inset>
-      <!-- 输入任意文本 -->
-      <van-field v-model="text" :placeholder="label" />
+      <template v-if="type === 'audit'">
+        <van-field name="radio" label="">
+          <template #input>
+            <van-radio-group v-model="checked" direction="horizontal">
+              <van-radio name="1">通过</van-radio>
+              <van-radio name="0">不通过</van-radio>
+            </van-radio-group>
+          </template>
+        </van-field>
+        <template v-if="checked == '0'">
+          <van-field v-model="reason" :placeholder="label" />
+        </template>
+      </template>
+      <template v-else>
+        <van-field v-model="text" :placeholder="label" />
+      </template>
     </van-cell-group>
   </van-dialog>
 </template>
