@@ -32,6 +32,13 @@ class api {
         ...userInfo.userParams,
       });
     },
+    getRecord: ({ taskid }: TaskParams): any  => {
+      userInfo = userInfoStore();
+      return Request.post("/taskservice.gettaskrecord", {
+        taskid,
+        ...userInfo.userParams,
+      });
+    },
     submitTask: ({ taskid, location, path }: TaskParams): any => {
       userInfo = userInfoStore();
       return Request.post("/taskservice.submittask", {
@@ -88,14 +95,15 @@ class api {
     submitdetail: ({ file, taskdetailid }: TaskParams): any => {
       userInfo = userInfoStore();
       const param = new FormData();
-      param.append("file", file.file);
+      param.append("file", file);
       console.log(param.get("file"));
       return Request.post("/taskservice.submitdetail", param, {
         headers: {
           name: userInfo.userParams.name,
           password: userInfo.userParams.password,
           taskdetailid: taskdetailid,
-          "Content-Type": "multipart/form-data;",
+          "Content-Type":
+            "multipart/form-data;boundary=fdd0f248-41a6-4f72-8c9f-fb1dd696ed84",
         },
       });
     },

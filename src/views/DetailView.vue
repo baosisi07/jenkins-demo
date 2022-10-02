@@ -22,6 +22,7 @@ let customFieldName = {
   text: "lowername",
 };
 detailStore.getDetailById(`${id}`);
+detailStore.getTaskRecord(`${id}`);
 
 const onConfirm = async (value: any, index: number) => {
   const duty = userStore.loginInfo.lowers[index].lowerid;
@@ -82,6 +83,7 @@ const previewImg = (index: number) => {
     startIndex: index,
   });
 };
+// 表单只读
 if (type === "done") {
   isReadOnly.value = true;
 }
@@ -106,7 +108,18 @@ if (type !== "done" && !detailStore.locationName) {
         size="large"
         :label="item.label"
       />
-      <!-- 仅显示 -->
+      <van-cell v-if="detailStore.records.length > 0">
+        <h3>操作记录</h3>
+        <div
+          class="records-item"
+          v-for="(item, i) in detailStore.records"
+          :key="i"
+        >
+          {{ item.createtime }} {{ item.createuser }} {{ item.recordtype }}
+          {{ item.remarks }}
+        </div>
+      </van-cell>
+      <!-- 仅显示子任务 -->
       <template v-if="isReadOnly">
         <van-cell
           v-for="(item, i) in detailStore.subTasks"
@@ -132,7 +145,7 @@ if (type !== "done" && !detailStore.locationName) {
           </template>
         </van-cell>
       </template>
-      <!-- 可编辑 -->
+      <!-- 可编辑子任务 -->
       <template v-else>
         <van-cell
           v-for="(item, i) in detailStore.subTasks"
@@ -329,5 +342,13 @@ if (type !== "done" && !detailStore.locationName) {
 }
 .desc-input {
   padding: 0;
+}
+.records-item {
+  padding: 10px 0;
+  color: var(--van-cell-value-color);
+  border-bottom: solid 1px var(--van-cell-border-color);
+  &:last-child {
+    border-bottom: 0;
+  }
 }
 </style>

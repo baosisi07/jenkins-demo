@@ -11,7 +11,12 @@ interface subTasksItem {
   fileList: any;
   note: string;
 }
-
+interface TaskRecord {
+  createtime: string;
+  createuser: string;
+  recordtype: string;
+  remarks: string;
+}
 export const useDetailStore = defineStore("detail", {
   state: () => ({
     taskItems: [
@@ -25,9 +30,10 @@ export const useDetailStore = defineStore("detail", {
       { name: "任务描述", itemname: "desc", value: "", label: "哈哈哈" },
     ],
     locationName: "",
+    records: [] as TaskRecord[],
     subTasks: [] as subTasksItem[],
     images: [],
-    startIndex: 0
+    startIndex: 0,
   }),
   actions: {
     async submitNote(index: number, note: string) {
@@ -67,7 +73,20 @@ export const useDetailStore = defineStore("detail", {
     beforeRead(index: number) {
       const that = this;
       return async function (file: any, detail: any) {
-        console.log("before read", index, file.file, detail);
+        const fileItem = that.subTasks[index].fileList[0];
+        console.log("before read", index, file, detail);
+        const { code, message, path } = await api.task.submitdetail({
+          file: file,
+          taskdetailid: that.subTasks[index].detailid,
+        });
+        Toast(message);
+        if (+code === 0) {
+          const url = import.meta.env.VITE_IMG_PRE_PATH + path;
+          that.setFileItemImg(index, url);
+        } else {
+          fileItem.status = "failed";
+          fileItem.message = "上传失败";
+        }
       };
     },
     afterRead(index: number) {
@@ -76,22 +95,22 @@ export const useDetailStore = defineStore("detail", {
       return async function (file: any, detail: any) {
         const fileItem = that.subTasks[index].fileList[0];
         console.log("after read", file.file);
-        fileItem.status = "uploading";
-        fileItem.message = "上传中...";
-        const { code, message, path } = await api.task.submitdetail({
-          file: file,
-          taskdetailid: that.subTasks[index].detailid,
-        });
-        Toast(message);
-        if (+code === 0) {
-          fileItem.status = "done";
-          fileItem.message = "上传成功";
-          const url = import.meta.env.VITE_IMG_PRE_PATH + path;
-          that.setFileItemImg(index, url);
-        } else {
-          fileItem.status = "failed";
-          fileItem.message = "上传失败";
-        }
+        // fileItem.status = "uploading";
+        // fileItem.message = "上传中...";
+        // const { code, message, path } = await api.task.submitdetail({
+        //   file: file,
+        //   taskdetailid: that.subTasks[index].detailid,
+        // });
+        // Toast(message);
+        // if (+code === 0) {
+        //   fileItem.status = "done";
+        //   fileItem.message = "上传成功";
+        //   const url = import.meta.env.VITE_IMG_PRE_PATH + path;
+        //   that.setFileItemImg(index, url);
+        // } else {
+        //   fileItem.status = "failed";
+        //   fileItem.message = "上传失败";
+        // }
       };
     },
     async getDetailById(id: string) {
@@ -136,11 +155,17 @@ export const useDetailStore = defineStore("detail", {
         );
       }
     },
+    async getTaskRecord(id: string) {
+      const { code, data } = await api.task.getRecord({ taskid: id });
+      if (+code === 0) {
+        this.records = data;
+      }
+    },
     async backTask({ taskid, rollbackreason }: any) {
       const res = await api.task.rollbackTask({ taskid, rollbackreason });
       return res;
     },
-  
+
     async assignTask({ taskid, duty }: any) {
       const res = await api.task.assignTask({ taskid, duty });
       return res;
