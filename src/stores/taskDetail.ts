@@ -179,5 +179,9 @@ export const useDetailStore = defineStore("detail", {
       const res = await api.task.auditTask({ taskid, duty });
       return res;
     },
+    async commitTask({ taskid, location, path }: any) {
+      const res = await api.task.submitTask({ taskid, location, path });
+      return res;
+    },
   },
 });

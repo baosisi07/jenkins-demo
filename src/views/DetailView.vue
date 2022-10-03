@@ -60,6 +60,47 @@ const submitAudit = async (params: any) => {
     return false;
   }
 };
+const commit = async () => {
+  Dialog.confirm({
+    title: "提示",
+    message: `是否提交 ${detailStore.taskItems[0].value} 任务`,
+    beforeClose: async function (action: string): Promise<any> {
+      if (action === "confirm") {
+        let doneNum = 0;
+        // 检查是否有未完成的子任务
+        for (let i = 0; i < detailStore.images.length; i++) {
+          if (!detailStore.images[i]) {
+            Dialog.alert({
+              message: `请完成 ${detailStore.subTasks[i].detailtitle} 任务后，再提交任务`,
+            }).then(() => {
+              // on close
+              return true;
+            });
+            break;
+          } else {
+            doneNum++;
+          }
+        }
+        if (doneNum === detailStore.images.length) {
+          const { code } = await detailStore.commitTask({
+            taskid: id,
+            location: detailStore.locationName,
+            path: "",
+          });
+          if (+code === 0) {
+            Toast("已提交");
+          } else {
+            Toast("提交失败");
+          }
+          return true;
+        }
+      } else {
+        return true;
+      }
+    },
+  });
+  //
+};
 const submit = async (text: string) => {
   if (!text) {
     Toast("请输入回退理由");
@@ -244,7 +285,9 @@ if (type !== "done" && !detailStore.locationName) {
     <van-row v-else-if="type === 'todo'" justify="center" class="btn-wrapper">
       <template v-if="userStore.loginInfo.assignable == '1'">
         <van-col span="8">
-          <van-button class="custom-btn" color="#169186" block>提交</van-button>
+          <van-button class="custom-btn" color="#169186" @click="commit" block
+            >提交</van-button
+          >
         </van-col>
         <van-col span="8" offset="2">
           <van-button
@@ -257,7 +300,9 @@ if (type !== "done" && !detailStore.locationName) {
         </van-col>
       </template>
       <van-col span="14" v-else>
-        <van-button class="custom-btn" color="#169186" block>提交</van-button>
+        <van-button class="custom-btn" color="#169186" @click="commit" block
+          >提交</van-button
+        >
       </van-col>
     </van-row>
     <!-- 超时 -->
@@ -268,7 +313,9 @@ if (type !== "done" && !detailStore.locationName) {
     >
       <template v-if="userStore.loginInfo.assignable == '1'">
         <van-col span="8">
-          <van-button class="custom-btn" color="#169186" block>提交</van-button>
+          <van-button class="custom-btn" color="#169186" @click="commit" block
+            >提交</van-button
+          >
         </van-col>
         <van-col span="8" offset="2">
           <van-button
@@ -281,7 +328,9 @@ if (type !== "done" && !detailStore.locationName) {
         </van-col>
       </template>
       <van-col span="14" v-else>
-        <van-button class="custom-btn" color="#169186" block>提交</van-button>
+        <van-button class="custom-btn" color="#169186" @click="commit" block
+          >提交</van-button
+        >
       </van-col>
     </van-row>
     <!-- 转派 -->
@@ -319,7 +368,9 @@ if (type !== "done" && !detailStore.locationName) {
     <!-- 其他 -->
     <van-row v-else-if="type === 'temp'" justify="center" class="btn-wrapper">
       <van-col span="14">
-        <van-button class="custom-btn" color="#FFB12A" block>提交</van-button>
+        <van-button class="custom-btn" color="#FFB12A" @click="commit" block
+          >提交</van-button
+        >
       </van-col>
     </van-row>
 
