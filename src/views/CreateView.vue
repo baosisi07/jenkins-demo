@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { Dialog } from "vant";
 import { ref, reactive } from "vue";
-import { useNewTaskStore } from "../stores/newTask";
+import { newTaskInfoStore } from "../stores/newTask";
+import { userInfoStore } from "../stores/userInfo";
 import "vant/es/dialog/style";
+const newTaskStore = newTaskInfoStore();
+const userStore = userInfoStore();
 
-const newTaskStore = useNewTaskStore();
-
+console.log(newTaskStore, userStore);
 const formValues = reactive({
   title: "",
   taskType: "",
-  taskLevel: "",
+  taskLevel: "普通任务",
   sitename: "",
   assignTo: "",
   startTime: "",
@@ -54,13 +56,29 @@ const onSubmit = (values: any) => {
   console.log("submit", values, formValues);
 };
 
-const showPicker = ref(false);
+const showPicker1 = ref(false);
+const showPicker2 = ref(false);
+const showPicker3 = ref(false);
+const showPicker4 = ref(false);
 const isShowStartCalendar = ref(false);
 const isShowEndCalendar = ref(false);
 const isShowRemindCalendar = ref(false);
 const showPop = (value: string) => {
   formValues.listName = value;
-  showPicker.value = true;
+  switch (value) {
+    case "taskTypeList":
+      showPicker1.value = true;
+      break;
+    case "taskLevelList":
+      showPicker2.value = true;
+      break;
+    case "siteList":
+      showPicker3.value = true;
+      break;
+    case "personList":
+      showPicker4.value = true;
+      break;
+  }
 };
 
 const onConfirmStartCalendar = (date: Date) => {
@@ -84,22 +102,26 @@ const onConfirmRemindCalendar = (date: Date) => {
 
   isShowRemindCalendar.value = false;
 };
-const onConfirm = (value: string) => {
+const onConfirm = (value: any) => {
+  console.log(value);
   switch (formValues.listName) {
     case "taskTypeList":
-      formValues.taskType = value;
+      formValues.taskType = value.value;
+      showPicker1.value = false;
       break;
     case "taskLevelList":
-      formValues.taskLevel = value;
+      formValues.taskLevel = value.value;
+      showPicker2.value = false;
       break;
     case "siteList":
-      formValues.sitename = value;
+      formValues.sitename = value.siteid;
+      showPicker3.value = false;
       break;
     case "personList":
-      formValues.assignTo = value;
+      formValues.assignTo = value.lowerid;
+      showPicker4.value = false;
       break;
   }
-  showPicker.value = false;
 };
 
 const onClickLeft = () => {
@@ -161,14 +183,40 @@ const onClickLeft = () => {
           placeholder="点击选择"
           @click="showPop('personList')"
         />
-        <van-popup v-model:show="showPicker" position="bottom">
+        <van-popup v-model:show="showPicker1" position="bottom">
           <van-picker
-            :columns="newTaskStore[formValues.listName]"
+            :columns="newTaskStore.taskTypeList"
+            :columns-field-names="{ text: 'name' }"
             @confirm="onConfirm"
-            @cancel="showPicker = false"
+            :default-index="0"
+            @cancel="showPicker1 = false"
           />
         </van-popup>
-
+        <van-popup v-model:show="showPicker2" position="bottom">
+          <van-picker
+            :columns="newTaskStore.taskLevelList"
+            @confirm="onConfirm"
+            :columns-field-names="{ text: 'name' }"
+            :default-index="0"
+            @cancel="showPicker2 = false"
+          />
+        </van-popup>
+        <van-popup v-model:show="showPicker3" position="bottom">
+          <van-picker
+            :columns="userStore.loginInfo.sites"
+            @confirm="onConfirm"
+            :columns-field-names="{ text: 'sitename' }"
+            @cancel="showPicker3 = false"
+          />
+        </van-popup>
+        <van-popup v-model:show="showPicker4" position="bottom">
+          <van-picker
+            :columns="userStore.loginInfo.lowers"
+            @confirm="onConfirm"
+            :columns-field-names="{ text: 'lowername' }"
+            @cancel="showPicker4 = false"
+          />
+        </van-popup>
         <van-field
           v-model="formValues.startTime"
           is-link
@@ -230,15 +278,6 @@ const onClickLeft = () => {
           >
             <template #preview-cover="{}">
               <div class="img-cover-area" @click="showPreview"></div>
-              <!-- <van-field
-                class="img-field"
-                v-model="formValues.fileInfo[imgIndex]"
-                rows="1"
-                name="imgDesc"
-                type="textarea"
-                :autosize="{ maxHeight: 44 }"
-                placeholder="请输入描述信息"
-              /> -->
             </template>
           </van-uploader>
           <div class="img-desc-list" v-if="formValues.fileList.length > 0">

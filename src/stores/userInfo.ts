@@ -5,7 +5,11 @@ interface dutyPerson {
   lowerid: string;
   lowername: string;
 }
-export const userInfoStore = defineStore("create", {
+interface Sites {
+  siteid: string;
+  sitename: string;
+}
+export const userInfoStore = defineStore("user", {
   state: () => ({
     isLoggedIn: true,
     loginInfo: {
@@ -27,6 +31,20 @@ export const userInfoStore = defineStore("create", {
           lowername: "丰鹤发电",
         },
       ] as dutyPerson[], // 指派人列表
+      sites: [
+        { siteid: "1000000737", sitename: "点式六参数模板(A类)" },
+        { siteid: "1000000738", sitename: "甘肃模板" },
+        { siteid: "1000000739", sitename: "网格化小型站（MFC季度的）" },
+        { siteid: "1000000740", sitename: "长光程小型站（MFC季度）" },
+        { siteid: "1000000741", sitename: "单颗粒物或者两参数颗粒物" },
+        {
+          siteid: "1000000742",
+          sitename: "小型站（MFC季度、颗粒物温度压力两月）",
+        },
+        { siteid: "1000000743", sitename: "廊坊vocs和小型站" },
+        { siteid: "1000000744", sitename: "三参数颗粒物" },
+        { siteid: "1000000745", sitename: "苏州两参数（PM2.5+O3）" },
+      ] as Sites[],
     },
   }),
   getters: {
@@ -37,6 +55,12 @@ export const userInfoStore = defineStore("create", {
         // name: encodeUserInfo(state.loginInfo.name),
         // password: encodeUserInfo(state.loginInfo.password),
       };
+    },
+    siteList: (state) => {
+      return state.loginInfo.sites.map((item) => item.sitename);
+    },
+    personList: (state) => {
+      return state.loginInfo.lowers.map((item) => item.lowername);
     },
   },
 });

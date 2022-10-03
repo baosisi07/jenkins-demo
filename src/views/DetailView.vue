@@ -9,6 +9,7 @@ import { Toast, Dialog } from "vant";
 const route = useRoute();
 const detailStore = useDetailStore();
 const userStore = userInfoStore();
+console.log(detailStore, userStore);
 const id = route.query.id;
 const type = route.query.type;
 console.log(id, type);
