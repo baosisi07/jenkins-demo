@@ -1,16 +1,9 @@
 <script setup lang="ts">
-import { ref, watch, watchEffect } from "vue";
-import type { Ref } from "vue";
 import { useHomeStore } from "../stores/taskList";
-import type { Item } from "../stores/taskList";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 const homeStore = useHomeStore();
-const currentList: Ref<Item[]> = ref([]);
-const currentLoading = ref(false);
-const currentFinished = ref(false);
-const currentRefreshing = ref(false);
 const getSiteList = async (type: string = "todo") => {
   homeStore.getSiteList(type);
 };
@@ -20,27 +13,17 @@ const switchList = (name: string, title: string) => {
   homeStore.getSiteList(name);
 };
 const collapseSwitch = async (name: string) => {
-  console.log(name);
-  // await api.task.getTaskList({ siteid: name, type: activeType.value });
-};
-watchEffect(() => {
-  const { list, loading, refreshing, finished } =
-    homeStore.getCurrentListOption(homeStore.activeType);
-  currentList.value = list;
-  currentLoading.value = loading;
-  currentRefreshing.value = refreshing;
-  currentFinished.value = finished;
-  console.log(currentList.value);
-});
-watch(
-  () => homeStore.activeSite,
-  async (newVal, oldVal) => {
-    if (newVal && newVal !== oldVal) {
-      homeStore.getTaskList({ siteid: newVal });
-    }
+  console.log("sss", name);
+  if (name) {
+    homeStore.setListOption({
+      type: homeStore.activeType,
+      itemname: "activeSite",
+      val: name,
+    });
   }
-);
-const onRefresh = () => {
+};
+
+const onRefresh = (type: string, isRefresh: boolean) => {
   homeStore.setListOption({
     type: homeStore.activeType,
     itemname: "finished",
@@ -51,7 +34,7 @@ const onRefresh = () => {
     itemname: "loading",
     val: false,
   });
-  homeStore.getSiteList();
+  homeStore.getSiteList(type, isRefresh);
 };
 
 const toDetail = (item: any) => {
@@ -91,28 +74,31 @@ const createTask = () => {
         :title="item.title"
         :name="item.name"
       >
-        <van-pull-refresh v-model="currentRefreshing" @refresh="onRefresh">
+        <van-pull-refresh
+          v-model="item.refreshing"
+          @refresh="onRefresh(item.name, true)"
+        >
           <van-list
-            v-model:loading="currentLoading"
-            :finished="currentFinished"
+            v-model:loading="item.loading"
+            :finished="item.finished"
             finished-text="没有更多了"
             @load="getSiteList"
           >
             <van-collapse
-              v-model="homeStore.activeSite"
+              v-model="item.activeSite"
               accordion
               @change="collapseSwitch"
             >
               <van-collapse-item
-                v-for="item in currentList"
-                :key="item.site"
-                :title="item.sitename"
-                :name="item.site"
+                v-for="subitem in item.list"
+                :key="subitem.site"
+                :title="subitem.sitename"
+                :name="subitem.site"
                 size="large"
               >
                 <div
                   class="task-subitem"
-                  v-for="(s, i) in item.subList"
+                  v-for="(s, i) in subitem.subList"
                   :key="s.id"
                   @click="toDetail(s)"
                 >
@@ -120,7 +106,7 @@ const createTask = () => {
                   <p>站点：{{ s.site }}</p>
                   <p>执行人：{{ s.duty }}</p>
                   <p>结束时间：{{ s.endtime }}</p>
-                  <van-divider v-if="i !== item.subList.length - 1">
+                  <van-divider v-if="i !== subitem.subList.length - 1">
                   </van-divider>
                 </div>
               </van-collapse-item>

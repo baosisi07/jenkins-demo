@@ -56,14 +56,6 @@ export const userInfoStore = defineStore("user", {
     isLoggedIn: (state) => {
       return state.userParams.name && state.userParams.password;
     },
-    // userParams: (state) => {
-    //   return {
-    //     name: "utaLGxlOfh4=",
-    //     password: "FrgEcLSyBgU=",
-    //     // name: encodeUserInfo(state.loginInfo.name),
-    //     // password: encodeUserInfo(state.loginInfo.password),
-    //   };
-    // },
   },
   actions: {
     async userLogin({ name, password }: any) {
