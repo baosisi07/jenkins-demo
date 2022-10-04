@@ -13,12 +13,14 @@ const formValues = reactive({
   title: "",
   taskType: { value: 1000, name: "临时任务" },
   taskLevel: { value: 1, name: "普通任务" },
-  site: {} as Sites,
+  sites: {} as Sites,
   assignTo: {} as dutyPerson,
-  startTime: "",
-  endTime: "",
-  remindTime: "",
+  starttime: "",
+  endtime: "",
+  remindtime: "",
   desc: "",
+});
+const subTask = reactive({
   fileList: [],
   fileInfo: [],
 });
@@ -42,7 +44,7 @@ const beforeDel = (file: any, detail: any) => {
   })
     .then(() => {
       // on confirm
-      formValues.fileInfo.splice(detail.index, 1);
+      subTask.fileInfo.splice(detail.index, 1);
       return true;
     })
     .catch(() => {
@@ -53,12 +55,12 @@ const beforeDel = (file: any, detail: any) => {
 
 const onSubmit = async (values: any) => {
   console.log("submit", values, formValues);
-  const { taskType, taskLevel, assignTo, site, ...rest } = formValues;
+  const { taskType, taskLevel, assignTo, sites, ...rest } = formValues;
   const params = {
     ...rest,
-    site: site.sitename,
-    siteid: site.siteid,
-    duty: assignTo.lowerid,
+    site: sites.sitename || "",
+    siteid: sites.siteid || "",
+    duty: assignTo.lowerid || "",
     level: taskLevel.value,
     type: taskType.value,
   };
@@ -91,21 +93,21 @@ const showPop = (value: string) => {
 };
 
 const onConfirmStartCalendar = (date: Date) => {
-  formValues.startTime = `${date.getFullYear()}-${
+  formValues.starttime = `${date.getFullYear()}-${
     date.getMonth() + 1
   }-${date.getDate()}`;
 
   isShowStartCalendar.value = false;
 };
 const onConfirmEndCalendar = (date: Date) => {
-  formValues.endTime = `${date.getFullYear()}-${
+  formValues.endtime = `${date.getFullYear()}-${
     date.getMonth() + 1
   }-${date.getDate()}`;
 
   isShowEndCalendar.value = false;
 };
 const onConfirmRemindCalendar = (date: Date) => {
-  formValues.remindTime = `${date.getFullYear()}-${
+  formValues.remindtime = `${date.getFullYear()}-${
     date.getMonth() + 1
   }-${date.getDate()}`;
 
@@ -123,7 +125,7 @@ const onConfirm = (value: any) => {
       showPicker2.value = false;
       break;
     case "siteList":
-      formValues.site = value;
+      formValues.sites = value;
       showPicker3.value = false;
       break;
     case "personList":
@@ -175,7 +177,7 @@ const onClickLeft = () => {
           @click="showPop('taskLevelList')"
         />
         <van-field
-          v-model="formValues.site.sitename"
+          v-model="formValues.sites.sitename"
           is-link
           readonly
           name="sitename"
@@ -227,10 +229,10 @@ const onClickLeft = () => {
           />
         </van-popup>
         <van-field
-          v-model="formValues.startTime"
+          v-model="formValues.starttime"
           is-link
           readonly
-          name="startTime"
+          name="starttime"
           label="起始时间"
           placeholder="点击选择日期"
           @click="isShowStartCalendar = true"
@@ -241,10 +243,10 @@ const onClickLeft = () => {
           @confirm="onConfirmStartCalendar"
         />
         <van-field
-          v-model="formValues.endTime"
+          v-model="formValues.endtime"
           is-link
           readonly
-          name="endTime"
+          name="endtime"
           label="结束时间"
           placeholder="点击选择日期"
           @click="isShowEndCalendar = true"
@@ -255,10 +257,10 @@ const onClickLeft = () => {
           @confirm="onConfirmEndCalendar"
         />
         <van-field
-          v-model="formValues.remindTime"
+          v-model="formValues.remindtime"
           is-link
           readonly
-          name="remindTime"
+          name="remindtime"
           label="提醒时间"
           placeholder="点击选择日期"
           @click="isShowRemindCalendar = true"
@@ -279,7 +281,7 @@ const onClickLeft = () => {
         />
         <div class="upload-wrapper">
           <van-uploader
-            v-model="formValues.fileList"
+            v-model="subTask.fileList"
             preview-size="80"
             :preview-full-image="false"
             :after-read="afterRead"
@@ -289,12 +291,12 @@ const onClickLeft = () => {
               <div class="img-cover-area" @click="showPreview"></div>
             </template>
           </van-uploader>
-          <div class="img-desc-list" v-if="formValues.fileList.length > 0">
+          <div class="img-desc-list" v-if="subTask.fileList.length > 0">
             <van-field
-              v-for="(s, i) in formValues.fileList"
+              v-for="(s, i) in subTask.fileList"
               :key="i"
               class="img-field-item"
-              v-model="formValues.fileInfo[i]"
+              v-model="subTask.fileInfo[i]"
               rows="1"
               name="imgDesc"
               type="textarea"
@@ -312,7 +314,7 @@ const onClickLeft = () => {
     </van-form>
     <preview-imgs
       :isShow="isShowPreview"
-      :images="formValues.fileList"
+      :images="subTask.fileList"
       :startPosition="imgIndex"
       showIndex
     ></preview-imgs>
