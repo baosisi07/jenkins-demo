@@ -21,6 +21,7 @@ export const newTaskInfoStore = defineStore("create", {
       { value: 1, name: "普通任务" },
       { value: 0, name: "紧急任务" },
     ],
+    subTaskFileList: [] as string[],
   }),
   getters: {},
   actions: {
@@ -28,8 +29,21 @@ export const newTaskInfoStore = defineStore("create", {
       const { code } = await api.task.createTask(params);
       if (+code === 0) {
         Toast("任务创建成功");
+        history.back();
       } else {
         Toast.fail("任务创建失败");
+      }
+    },
+    async uploadFile(file: File) {
+      const { code, path } = await api.file.upload({
+        file: file,
+      });
+      if (+code === 0) {
+        Toast("上传成功");
+        // const url = import.meta.env.VITE_IMG_PRE_PATH + path;
+        this.subTaskFileList.push(path);
+      } else {
+        Toast("上传失败");
       }
     },
   },

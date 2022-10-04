@@ -7,12 +7,29 @@ import type { dutyPerson, Sites } from "../stores/userInfo";
 import "vant/es/dialog/style";
 const newTaskStore = newTaskInfoStore();
 const userStore = userInfoStore();
-
+interface detailItem {
+  note: string;
+  path: string;
+}
+interface taskForms {
+  title: string;
+  type: string;
+  level: string;
+  siteid: string;
+  site?: string;
+  duty: string;
+  starttime: string;
+  endtime: string;
+  remindtime: string;
+  desc: string;
+  details?: detailItem[];
+  [propname: string]: any;
+}
 console.log(newTaskStore, userStore);
 const formValues = reactive({
   title: "",
-  taskType: { value: 1000, name: "临时任务" },
-  taskLevel: { value: 1, name: "普通任务" },
+  taskType: { value: "1000", name: "临时任务" },
+  taskLevel: { value: "1", name: "普通任务" },
   sites: {} as Sites,
   assignTo: {} as dutyPerson,
   starttime: "",
@@ -37,6 +54,13 @@ const afterRead = (file: any, detail: any) => {
 
   imgIndex.value = detail.index;
 };
+const beforeRead = async (file: any, detail: any) => {
+  // 此时可以自行将文件上传至服务器
+  console.log(file, detail);
+  await newTaskStore.uploadFile(file.file);
+
+  imgIndex.value = detail.index;
+};
 const beforeDel = (file: any, detail: any) => {
   return Dialog.confirm({
     message: "删除当前子任务？",
@@ -45,6 +69,7 @@ const beforeDel = (file: any, detail: any) => {
     .then(() => {
       // on confirm
       subTask.fileInfo.splice(detail.index, 1);
+      newTaskStore.subTaskFileList.splice(detail.index, 1);
       return true;
     })
     .catch(() => {
@@ -55,16 +80,58 @@ const beforeDel = (file: any, detail: any) => {
 
 const onSubmit = async (values: any) => {
   console.log("submit", values, formValues);
-  const { taskType, taskLevel, assignTo, sites, ...rest } = formValues;
-  const params = {
-    ...rest,
-    site: sites.sitename || "",
-    siteid: sites.siteid || "",
-    duty: assignTo.lowerid || "",
-    level: taskLevel.value,
-    type: taskType.value,
-  };
-  await newTaskStore.createTask(params);
+  Dialog.confirm({
+    title: "提示",
+    message: `是否新建 ${formValues.title} 任务`,
+    beforeClose: async function (action: string): Promise<any> {
+      if (action === "confirm") {
+        const { taskType, taskLevel, assignTo, sites, title, ...rest } =
+          formValues;
+
+        let params: taskForms = {
+          title,
+          type: taskType.value,
+          level: taskLevel.value,
+          site: sites.sitename || "",
+          siteid: sites.siteid || "",
+          duty: assignTo.lowerid || "",
+          ...rest,
+        };
+
+        // 检查是否有未完成的子任务
+        const keys = Object.keys(params);
+        let doneNum = 0;
+        for (let i = 0; i < keys.length; i++) {
+          let key = keys[i];
+          if (!params[key]) {
+            Dialog.alert({
+              message: "请将表单填写完整",
+            }).then(() => {
+              return true;
+            });
+            break;
+          } else {
+            doneNum++;
+          }
+        }
+
+        if (doneNum === Object.keys(params).length) {
+          // 整理字任务信息
+          if (newTaskStore.subTaskFileList.length > 0) {
+            const { fileInfo } = subTask;
+            const details = newTaskStore.subTaskFileList.map((item, i) => {
+              return { path: item || "", note: fileInfo[i] || "" };
+            });
+            params.details = details;
+          }
+          await newTaskStore.createTask(params);
+          return true;
+        }
+      } else {
+        return true;
+      }
+    },
+  });
 };
 
 const showPicker1 = ref(false);
@@ -165,6 +232,7 @@ const onClickLeft = () => {
           name="taskType"
           label="任务类型"
           placeholder="点击选择任务类型"
+          :rules="[{ required: true, message: '请选择任务类型' }]"
           @click="showPop('taskTypeList')"
         />
         <van-field
@@ -174,6 +242,7 @@ const onClickLeft = () => {
           name="taskLevel"
           label="任务等级"
           placeholder="点击选择任务等级"
+          :rules="[{ required: true, message: '请填写任务等级' }]"
           @click="showPop('taskLevelList')"
         />
         <van-field
@@ -183,6 +252,7 @@ const onClickLeft = () => {
           name="sitename"
           label="站点名称"
           placeholder="点击选择站点名称"
+          :rules="[{ required: true, message: '请选择站点名称' }]"
           @click="showPop('siteList')"
         />
         <van-field
@@ -192,6 +262,7 @@ const onClickLeft = () => {
           name="assignTo"
           label="指派给"
           placeholder="点击选择"
+          :rules="[{ required: true, message: '请选择指派人员' }]"
           @click="showPop('personList')"
         />
         <van-popup v-model:show="showPicker1" position="bottom">
@@ -235,6 +306,7 @@ const onClickLeft = () => {
           name="starttime"
           label="起始时间"
           placeholder="点击选择日期"
+          :rules="[{ required: true, message: '请选择起始时间' }]"
           @click="isShowStartCalendar = true"
         />
         <van-calendar
@@ -249,6 +321,7 @@ const onClickLeft = () => {
           name="endtime"
           label="结束时间"
           placeholder="点击选择日期"
+          :rules="[{ required: true, message: '请选择结束时间' }]"
           @click="isShowEndCalendar = true"
         />
         <van-calendar
@@ -263,6 +336,7 @@ const onClickLeft = () => {
           name="remindtime"
           label="提醒时间"
           placeholder="点击选择日期"
+          :rules="[{ required: true, message: '请选择提醒时间' }]"
           @click="isShowRemindCalendar = true"
         />
         <van-calendar
@@ -278,6 +352,7 @@ const onClickLeft = () => {
           label="任务描述"
           type="textarea"
           placeholder="请输入任务描述"
+          :rules="[{ required: true, message: '请输入任务描述' }]"
         />
         <div class="upload-wrapper">
           <van-uploader
@@ -285,6 +360,7 @@ const onClickLeft = () => {
             preview-size="80"
             :preview-full-image="false"
             :after-read="afterRead"
+            :before-read="beforeRead"
             :before-delete="beforeDel"
           >
             <template #preview-cover="{}">

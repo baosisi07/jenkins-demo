@@ -100,7 +100,6 @@ const commit = async () => {
       }
     },
   });
-  //
 };
 const submit = async (text: string) => {
   if (!text) {
