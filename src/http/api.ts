@@ -9,7 +9,7 @@ interface TaskParams {
 }
 class api {
   public static file = {
-    upload: ({ file, taskdetailid }: TaskParams): any => {
+    upload: ({ file }: TaskParams): any => {
       userInfo = userInfoStore();
       const param = new FormData();
       param.append("file", file);
@@ -18,10 +18,16 @@ class api {
         headers: {
           name: userInfo.userParams.name,
           password: userInfo.userParams.password,
-          taskdetailid: taskdetailid,
           "Content-Type":
             "multipart/form-data;boundary=fdd0f248-41a6-4f72-8c9f-fb1dd696ed84",
         },
+      });
+    },
+  };
+  public static user = {
+    login: async (params: TaskParams): Promise<any> => {
+      return await Request.post("/userservice.login", {
+        ...params,
       });
     },
   };
@@ -129,7 +135,6 @@ class api {
         },
       });
     },
-    
   };
 }
 export default api;

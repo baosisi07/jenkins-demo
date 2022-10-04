@@ -1,6 +1,10 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import { encryptDes, encodeUserInfo } from "../utils/crypto.js";
+import api from "../http/api";
+import { Toast } from "vant";
+import "vant/es/toast/style";
+
 export interface dutyPerson {
   lowerid: string;
   lowername: string;
@@ -11,10 +15,11 @@ export interface Sites {
 }
 export const userInfoStore = defineStore("user", {
   state: () => ({
-    isLoggedIn: true,
+    userParams: {
+      name: "",
+      password: "",
+    },
     loginInfo: {
-      name: "admin",
-      password: "admin2",
       backflag: "1",
       assignable: "1",
       lowers: [
@@ -48,19 +53,47 @@ export const userInfoStore = defineStore("user", {
     },
   }),
   getters: {
-    userParams: (state) => {
-      return {
+    isLoggedIn: (state) => {
+      return state.userParams.name && state.userParams.password;
+    },
+    // userParams: (state) => {
+    //   return {
+    //     name: "utaLGxlOfh4=",
+    //     password: "FrgEcLSyBgU=",
+    //     // name: encodeUserInfo(state.loginInfo.name),
+    //     // password: encodeUserInfo(state.loginInfo.password),
+    //   };
+    // },
+  },
+  actions: {
+    async userLogin({ name, password }: any) {
+      // test
+      const params = {
         name: "utaLGxlOfh4=",
         password: "FrgEcLSyBgU=",
-        // name: encodeUserInfo(state.loginInfo.name),
-        // password: encodeUserInfo(state.loginInfo.password),
       };
+      // test end
+
+      // name = encodeUserInfo(name);
+      // password = encodeUserInfo(password);
+      const { code, message, data } = await api.user.login(params);
+      if (+code === 0) {
+        Toast("登录成功");
+        this.userParams = params;
+        this.loginInfo = data;
+      } else {
+        Toast(message);
+      }
+      return { code };
     },
-    siteList: (state) => {
-      return state.loginInfo.sites.map((item) => item.sitename);
-    },
-    personList: (state) => {
-      return state.loginInfo.lowers.map((item) => item.lowername);
-    },
+  },
+  persist: {
+    enabled: true,
+    strategies: [
+      {
+        key: "loginInfo",
+        storage: localStorage,
+      },
+    ],
   },
 });
