@@ -1,6 +1,8 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
-
+import api from "../http/api";
+import { Toast } from "vant";
+import "vant/es/toast/style";
 export const newTaskInfoStore = defineStore("create", {
   state: () => ({
     taskTypeList: [
@@ -21,4 +23,14 @@ export const newTaskInfoStore = defineStore("create", {
     ],
   }),
   getters: {},
+  actions: {
+    async createTask(params: any) {
+      const { code } = await api.task.createTask(params);
+      if (+code === 0) {
+        Toast("任务创建成功");
+      } else {
+        Toast.fail("任务创建失败");
+      }
+    },
+  },
 });

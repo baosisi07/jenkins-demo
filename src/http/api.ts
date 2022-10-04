@@ -32,7 +32,7 @@ class api {
         ...userInfo.userParams,
       });
     },
-    getRecord: ({ taskid }: TaskParams): any  => {
+    getRecord: ({ taskid }: TaskParams): any => {
       userInfo = userInfoStore();
       return Request.post("/taskservice.gettaskrecord", {
         taskid,
@@ -91,7 +91,13 @@ class api {
         ...userInfo.userParams,
       });
     },
-
+    createTask: (params: TaskParams): any => {
+      userInfo = userInfoStore();
+      return Request.post("/taskservice.createtask", {
+        ...params,
+        ...userInfo.userParams,
+      });
+    },
     submitdetail: ({ file, taskdetailid }: TaskParams): any => {
       userInfo = userInfoStore();
       const param = new FormData();

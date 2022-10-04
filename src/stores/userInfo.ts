@@ -1,11 +1,11 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import { encryptDes, encodeUserInfo } from "../utils/crypto.js";
-interface dutyPerson {
+export interface dutyPerson {
   lowerid: string;
   lowername: string;
 }
-interface Sites {
+export interface Sites {
   siteid: string;
   sitename: string;
 }

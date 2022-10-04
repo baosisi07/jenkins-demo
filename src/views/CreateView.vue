@@ -3,6 +3,7 @@ import { Dialog } from "vant";
 import { ref, reactive } from "vue";
 import { newTaskInfoStore } from "../stores/newTask";
 import { userInfoStore } from "../stores/userInfo";
+import type { dutyPerson, Sites } from "../stores/userInfo";
 import "vant/es/dialog/style";
 const newTaskStore = newTaskInfoStore();
 const userStore = userInfoStore();
@@ -10,20 +11,18 @@ const userStore = userInfoStore();
 console.log(newTaskStore, userStore);
 const formValues = reactive({
   title: "",
-  taskType: "",
-  taskLevel: "普通任务",
-  sitename: "",
-  assignTo: "",
+  taskType: { value: 1000, name: "临时任务" },
+  taskLevel: { value: 1, name: "普通任务" },
+  site: {} as Sites,
+  assignTo: {} as dutyPerson,
   startTime: "",
   endTime: "",
   remindTime: "",
-  taskDesc: "",
-  listName: "",
-  calendarName: "",
+  desc: "",
   fileList: [],
   fileInfo: [],
 });
-
+const listName = ref("");
 const isShowPreview = ref(false);
 const imgIndex = ref(0);
 const showPreview = () => {
@@ -52,8 +51,18 @@ const beforeDel = (file: any, detail: any) => {
     });
 };
 
-const onSubmit = (values: any) => {
+const onSubmit = async (values: any) => {
   console.log("submit", values, formValues);
+  const { taskType, taskLevel, assignTo, site, ...rest } = formValues;
+  const params = {
+    ...rest,
+    site: site.sitename,
+    siteid: site.siteid,
+    duty: assignTo.lowerid,
+    level: taskLevel.value,
+    type: taskType.value,
+  };
+  await newTaskStore.createTask(params);
 };
 
 const showPicker1 = ref(false);
@@ -64,7 +73,7 @@ const isShowStartCalendar = ref(false);
 const isShowEndCalendar = ref(false);
 const isShowRemindCalendar = ref(false);
 const showPop = (value: string) => {
-  formValues.listName = value;
+  listName.value = value;
   switch (value) {
     case "taskTypeList":
       showPicker1.value = true;
@@ -104,21 +113,21 @@ const onConfirmRemindCalendar = (date: Date) => {
 };
 const onConfirm = (value: any) => {
   console.log(value);
-  switch (formValues.listName) {
+  switch (listName.value) {
     case "taskTypeList":
-      formValues.taskType = value.value;
+      formValues.taskType = value;
       showPicker1.value = false;
       break;
     case "taskLevelList":
-      formValues.taskLevel = value.value;
+      formValues.taskLevel = value;
       showPicker2.value = false;
       break;
     case "siteList":
-      formValues.sitename = value.siteid;
+      formValues.site = value;
       showPicker3.value = false;
       break;
     case "personList":
-      formValues.assignTo = value.lowerid;
+      formValues.assignTo = value;
       showPicker4.value = false;
       break;
   }
@@ -143,12 +152,12 @@ const onClickLeft = () => {
       <van-cell-group>
         <van-field
           v-model="formValues.title"
-          name="taskTitle"
+          name="title"
           label="任务标题"
           :rules="[{ required: true, message: '请填写任务标题' }]"
         />
         <van-field
-          v-model="formValues.taskType"
+          v-model="formValues.taskType.name"
           is-link
           readonly
           name="taskType"
@@ -157,7 +166,7 @@ const onClickLeft = () => {
           @click="showPop('taskTypeList')"
         />
         <van-field
-          v-model="formValues.taskLevel"
+          v-model="formValues.taskLevel.name"
           is-link
           readonly
           name="taskLevel"
@@ -166,7 +175,7 @@ const onClickLeft = () => {
           @click="showPop('taskLevelList')"
         />
         <van-field
-          v-model="formValues.sitename"
+          v-model="formValues.site.sitename"
           is-link
           readonly
           name="sitename"
@@ -175,7 +184,7 @@ const onClickLeft = () => {
           @click="showPop('siteList')"
         />
         <van-field
-          v-model="formValues.assignTo"
+          v-model="formValues.assignTo.lowername"
           is-link
           readonly
           name="assignTo"
@@ -260,10 +269,10 @@ const onClickLeft = () => {
           @confirm="onConfirmRemindCalendar"
         />
         <van-field
-          v-model="formValues.taskDesc"
+          v-model="formValues.desc"
           rows="1"
           autosize
-          name="taskDesc"
+          name="desc"
           label="任务描述"
           type="textarea"
           placeholder="请输入任务描述"
@@ -311,6 +320,7 @@ const onClickLeft = () => {
 </template>
 <style lang="scss" scoped>
 .upload-wrapper {
+  background-color: #fff;
   position: relative;
   padding: 18px 16px;
 }
