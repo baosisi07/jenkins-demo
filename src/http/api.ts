@@ -28,6 +28,12 @@ class api {
     },
   };
   public static task = {
+    getTime: async () => {
+      userInfo = userInfoStore();
+      return await Request.post("/taskservice.gettime", {
+        ...userInfo.userParams,
+      });
+    },
     getSiteList: async ({ type }: TaskParams): Promise<any> => {
       userInfo = userInfoStore();
       return await Request.post("/taskservice.getsite", {

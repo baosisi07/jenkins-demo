@@ -5,6 +5,8 @@ import { newTaskInfoStore } from "../stores/newTask";
 import { userInfoStore } from "../stores/userInfo";
 import type { dutyPerson, Sites } from "../stores/userInfo";
 import "vant/es/dialog/style";
+import { base64AddWaterMaker, dataURLtoFile } from "../utils/watermark";
+
 const newTaskStore = newTaskInfoStore();
 const userStore = userInfoStore();
 interface detailItem {
@@ -49,10 +51,24 @@ const showPreview = () => {
 };
 
 const afterRead = async (file: any, detail: any) => {
+  file.status = "uploading";
+  file.message = "处理中...";
+
+  let resultBase64 = await base64AddWaterMaker(file.content);
+  file.content = resultBase64;
+  const lastFile = dataURLtoFile(resultBase64);
+  file.message = "上传中...";
   // 此时可以自行将文件上传至服务器
   const param = new FormData();
-  param.append("file", file.file);
-  await newTaskStore.uploadFile(param);
+  param.append("file", lastFile);
+  const { code } = await newTaskStore.uploadFile(param);
+  if (+code === 0) {
+    file.status = "done";
+    file.message = "上传成功";
+  } else {
+    file.status = "failed";
+    file.message = "上传失败";
+  }
   imgIndex.value = detail.index;
 };
 const beforeRead = async (file: any, detail: any) => {
@@ -389,7 +405,7 @@ const onClickLeft = () => {
     </van-form>
     <preview-imgs
       :isShow="isShowPreview"
-      :images="subTask.fileList"
+      :images="newTaskStore.previewImages"
       :startPosition="imgIndex"
       showIndex
       :closeFn="() => (isShowPreview = false)"

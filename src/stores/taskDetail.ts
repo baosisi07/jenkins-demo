@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import api from "../http/api";
 import { Toast } from "vant";
 import "vant/es/toast/style";
+import { base64AddWaterMaker, dataURLtoFile } from "../utils/watermark";
 interface subTasksItem {
   detailid: string;
   detailtitle: string;
@@ -32,7 +33,7 @@ export const useDetailStore = defineStore("detail", {
     locationName: "",
     records: [] as TaskRecord[],
     subTasks: [] as subTasksItem[],
-    images: [],
+    images: [] as string[],
     startIndex: 0,
   }),
   actions: {
@@ -66,6 +67,7 @@ export const useDetailStore = defineStore("detail", {
                 },
               ]
             : [];
+          this.images[i] = url;
           break;
         }
       }
@@ -79,12 +81,16 @@ export const useDetailStore = defineStore("detail", {
 
       return async function (file: any, detail: any) {
         const fileItem = that.subTasks[index].fileList[0];
-        console.log("after read", file.file);
-        const param = new FormData();
-        param.append("file", file.file);
-        console.log(param.get("file"));
         fileItem.status = "uploading";
+        fileItem.message = "处理中...";
+
+        const resultBase64 = await base64AddWaterMaker(file.content);
+        file.content = resultBase64;
+        const lastFile = dataURLtoFile(resultBase64);
         fileItem.message = "上传中...";
+        const param = new FormData();
+        param.append("file", lastFile);
+        console.log(param.get("file"));
         const { code, message, path } = await api.task.submitdetail({
           file: param,
           taskdetailid: that.subTasks[index].detailid,

@@ -1,4 +1,5 @@
 import { useDetailStore } from "../stores/taskDetail";
+import { userInfoStore } from "../stores/userInfo";
 //关于状态码
 const BMAP_STATUS_SUCCESS = 0; //检索成功。对应数值“0”。
 const BMAP_STATUS_CITY_LIST = 1; //城市列表。对应数值“1”。
@@ -11,7 +12,6 @@ const BMAP_STATUS_SERVICE_UNAVAILABLE = 7; //服务不可用。对应数值“7�
 const BMAP_STATUS_TIMEOUT = 8; //超时。对应数值“8”。(自 1.1 新增)
 //自动定位
 declare const BMapGL: any;
-const detailStore = useDetailStore();
 
 const requireScript = function (url: string) {
   return new Promise((resolve: any) => {
@@ -69,6 +69,7 @@ const getLocationName = function (lng: number, lat: number) {
   // 根据坐标得到地址描述
   myGeo.getLocation(new BMapGL.Point(lng, lat), function (result: any) {
     if (result) {
+      const detailStore = useDetailStore();
       detailStore.$patch((state) => {
         state.locationName = result.address;
       });
@@ -85,6 +86,13 @@ export default function locationByBaidu() {
       const lng = r.point.lng;
       const lat = r.point.lat;
       getLocationName(lng, lat);
+      const userStore = userInfoStore();
+      userStore.$patch((state) => {
+        state.location = {
+          lat,
+          lng,
+        };
+      });
     } else {
       console.log("定位失败：" + this.getStatus());
     }

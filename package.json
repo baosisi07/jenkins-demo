@@ -10,6 +10,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@sangtian152/watermark": "^1.0.7",
     "axios": "^0.27.2",
     "crypto-js": "^4.1.1",
     "jquery": "^3.6.1",

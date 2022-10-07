@@ -19,6 +19,10 @@ export const userInfoStore = defineStore("user", {
       name: "",
       password: "",
     },
+    location: {
+      lng: null,
+      lat: null
+    },
     loginInfo: {
       backflag: "1",
       assignable: "1",

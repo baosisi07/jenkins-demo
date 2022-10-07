@@ -231,7 +231,6 @@ if (type !== "done" && !detailStore.locationName) {
                 :before-delete="detailStore.beforeDel(i)"
                 :after-read="detailStore.afterRead(i)"
                 :before-read="detailStore.beforeRead(i)"
-                result-type="file"
                 :preview-full-image="false"
                 @click-preview="previewImg(i)"
               />

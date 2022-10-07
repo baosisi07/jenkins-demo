@@ -23,7 +23,11 @@ export const newTaskInfoStore = defineStore("create", {
     ],
     subTaskFileList: [] as string[],
   }),
-  getters: {},
+  getters: {
+    previewImages(state) {
+      return state.subTaskFileList.map(item => import.meta.env.VITE_IMG_PRE_PATH + item)
+    }
+  },
   actions: {
     async createTask(params: any) {
       const { code } = await api.task.createTask(params);
@@ -43,6 +47,7 @@ export const newTaskInfoStore = defineStore("create", {
       } else {
         Toast("上传失败");
       }
+      return { code, path };
     },
   },
 });
