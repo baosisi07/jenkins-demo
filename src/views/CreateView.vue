@@ -393,6 +393,7 @@ const onClickLeft = () => {
       :images="subTask.fileList"
       :startPosition="imgIndex"
       showIndex
+      :closeFn="() => (isShowPreview = false)"
     ></preview-imgs>
   </div>
 </template>

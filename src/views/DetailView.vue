@@ -380,6 +380,7 @@ if (type !== "done" && !detailStore.locationName) {
       :images="detailStore.images"
       :startPosition="detailStore.startIndex"
       showIndex
+      :closeFn="() => (isShow = false)"
     ></preview-imgs>
     <!-- 回退弹框 -->
     <input-dialog

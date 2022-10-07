@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { ImagePreview } from "vant";
 import "vant/es/image-preview/style";
 
@@ -9,10 +9,18 @@ const props = defineProps<{
   images: any[];
   startPosition: number;
   showIndex: boolean;
+  closeFn: Function;
 }>();
-
+let isShowPreview = ref(false);
 let deg = ref(0);
 let currentImg = ref();
+
+watch(
+  () => props.isShow,
+  (val) => {
+    isShowPreview.value = val;
+  }
+);
 
 const rotateImg = () => {
   deg.value = deg.value + 90;
@@ -35,6 +43,7 @@ const rotateImg = () => {
 const switchImg = (index: number) => {
   deg.value = 0;
   const parentEl = document.querySelector(".user-upload-img");
+  if (!parentEl) return;
   const imgWapper = parentEl?.querySelectorAll(".van-swipe-item")[
     index
   ] as Record<string, any>;
@@ -46,12 +55,12 @@ const switchImg = (index: number) => {
 <template>
   <!-- 自定义预览 -->
   <van-image-preview
-    v-model:show="isShow"
-    :show-index="false"
+    v-model:show="isShowPreview"
     :images="images"
     :startPosition="startPosition"
     :showIndex="showIndex"
     @change="switchImg"
+    @closed="closeFn"
     class-name="user-upload-img"
   >
     <template v-slot:cover>
