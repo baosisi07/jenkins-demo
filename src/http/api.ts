@@ -9,17 +9,13 @@ interface TaskParams {
 }
 class api {
   public static file = {
-    upload: ({ file }: TaskParams): any => {
+    upload: (file: FormData): any => {
       userInfo = userInfoStore();
-      const param = new FormData();
-      param.append("file", file);
-      console.log(param.get("file"));
-      return Request.post("/fileservice.upload", param, {
+      return Request.post("/fileservice.upload", file, {
         headers: {
           name: userInfo.userParams.name,
           password: userInfo.userParams.password,
-          "Content-Type":
-            "multipart/form-data;boundary=fdd0f248-41a6-4f72-8c9f-fb1dd696ed84",
+          "Content-Type": "multipart/form-data",
         },
       });
     },
@@ -122,16 +118,13 @@ class api {
     },
     submitdetail: ({ file, taskdetailid }: TaskParams): any => {
       userInfo = userInfoStore();
-      const param = new FormData();
-      param.append("file", file);
-      console.log(param.get("file"));
-      return Request.post("/taskservice.submitdetail", param, {
+
+      return Request.post("/taskservice.submitdetail", file, {
         headers: {
           name: userInfo.userParams.name,
           password: userInfo.userParams.password,
           taskdetailid: taskdetailid,
-          "Content-Type":
-            "multipart/form-data;boundary=fdd0f248-41a6-4f72-8c9f-fb1dd696ed84",
+          "Content-Type": "multipart/form-data",
         },
       });
     },

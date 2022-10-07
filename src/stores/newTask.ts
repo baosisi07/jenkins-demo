@@ -34,10 +34,8 @@ export const newTaskInfoStore = defineStore("create", {
         Toast.fail("任务创建失败");
       }
     },
-    async uploadFile(file: File) {
-      const { code, path } = await api.file.upload({
-        file: file,
-      });
+    async uploadFile(file: FormData) {
+      const { code, path } = await api.file.upload(file);
       if (+code === 0) {
         Toast("上传成功");
         // const url = import.meta.env.VITE_IMG_PRE_PATH + path;

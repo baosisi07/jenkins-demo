@@ -72,22 +72,7 @@ export const useDetailStore = defineStore("detail", {
     },
     beforeRead(index: number) {
       const that = this;
-      return async function (file: any, detail: any) {
-        const fileItem = that.subTasks[index].fileList[0];
-        console.log("before read", index, file, detail);
-        const { code, message, path } = await api.task.submitdetail({
-          file: file,
-          taskdetailid: that.subTasks[index].detailid,
-        });
-        Toast(message);
-        if (+code === 0) {
-          const url = import.meta.env.VITE_IMG_PRE_PATH + path;
-          that.setFileItemImg(index, url);
-        } else {
-          fileItem.status = "failed";
-          fileItem.message = "上传失败";
-        }
-      };
+      return async function (file: any, detail: any) {};
     },
     afterRead(index: number) {
       const that = this;
@@ -95,22 +80,25 @@ export const useDetailStore = defineStore("detail", {
       return async function (file: any, detail: any) {
         const fileItem = that.subTasks[index].fileList[0];
         console.log("after read", file.file);
-        // fileItem.status = "uploading";
-        // fileItem.message = "上传中...";
-        // const { code, message, path } = await api.task.submitdetail({
-        //   file: file,
-        //   taskdetailid: that.subTasks[index].detailid,
-        // });
-        // Toast(message);
-        // if (+code === 0) {
-        //   fileItem.status = "done";
-        //   fileItem.message = "上传成功";
-        //   const url = import.meta.env.VITE_IMG_PRE_PATH + path;
-        //   that.setFileItemImg(index, url);
-        // } else {
-        //   fileItem.status = "failed";
-        //   fileItem.message = "上传失败";
-        // }
+        const param = new FormData();
+        param.append("file", file.file);
+        console.log(param.get("file"));
+        fileItem.status = "uploading";
+        fileItem.message = "上传中...";
+        const { code, message, path } = await api.task.submitdetail({
+          file: param,
+          taskdetailid: that.subTasks[index].detailid,
+        });
+        Toast(message);
+        if (+code === 0) {
+          fileItem.status = "done";
+          fileItem.message = "上传成功";
+          const url = import.meta.env.VITE_IMG_PRE_PATH + path;
+          that.setFileItemImg(index, url);
+        } else {
+          fileItem.status = "failed";
+          fileItem.message = "上传失败";
+        }
       };
     },
     async getDetailById(id: string) {

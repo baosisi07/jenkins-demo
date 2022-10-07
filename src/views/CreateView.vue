@@ -48,17 +48,14 @@ const showPreview = () => {
   isShowPreview.value = true;
 };
 
-const afterRead = (file: any, detail: any) => {
+const afterRead = async (file: any, detail: any) => {
   // 此时可以自行将文件上传至服务器
-  console.log(file, detail);
-
+  const param = new FormData();
+  param.append("file", file.file);
+  await newTaskStore.uploadFile(param);
   imgIndex.value = detail.index;
 };
 const beforeRead = async (file: any, detail: any) => {
-  // 此时可以自行将文件上传至服务器
-  console.log(file, detail);
-  await newTaskStore.uploadFile(file.file);
-
   imgIndex.value = detail.index;
 };
 const beforeDel = (file: any, detail: any) => {
@@ -116,7 +113,7 @@ const onSubmit = async (values: any) => {
         }
 
         if (doneNum === Object.keys(params).length) {
-          // 整理字任务信息
+          // 整理子任务信息
           if (newTaskStore.subTaskFileList.length > 0) {
             const { fileInfo } = subTask;
             const details = newTaskStore.subTaskFileList.map((item, i) => {
@@ -362,6 +359,8 @@ const onClickLeft = () => {
             :after-read="afterRead"
             :before-read="beforeRead"
             :before-delete="beforeDel"
+            capture="camera"
+            accept="image/png, image/jpeg"
           >
             <template #preview-cover="{}">
               <div class="img-cover-area" @click="showPreview"></div>

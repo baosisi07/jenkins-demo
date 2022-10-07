@@ -226,6 +226,8 @@ if (type !== "done" && !detailStore.locationName) {
                 v-model="item.fileList"
                 preview-size="6rem"
                 :max-count="1"
+                capture="camera"
+                accept="image/png, image/jpeg"
                 :before-delete="detailStore.beforeDel(i)"
                 :after-read="detailStore.afterRead(i)"
                 :before-read="detailStore.beforeRead(i)"

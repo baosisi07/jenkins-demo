@@ -23,7 +23,7 @@ export class Request {
   static post = (url: string, params?: any, config?: any) => {
     return new Promise((resolve, reject) => {
       axios
-        .post(url, JSON.stringify(params), config)
+        .post(url, params, config)
         .then((res) => {
           resolve(res.data);
         })
