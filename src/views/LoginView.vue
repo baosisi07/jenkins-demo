@@ -54,6 +54,9 @@ const onSubmit = async (values: any) => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background-image: url(../assets/login.png);
+  background-repeat: no-repeat;
+  background-size: contain;
 }
 .login-title {
   text-align: center;
