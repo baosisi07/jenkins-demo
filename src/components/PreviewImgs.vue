@@ -4,7 +4,7 @@ import { ImagePreview } from "vant";
 import "vant/es/image-preview/style";
 
 const VanImagePreview = ImagePreview.Component;
-defineProps<{
+const props = defineProps<{
   isShow: boolean;
   images: any[];
   startPosition: number;
@@ -18,7 +18,12 @@ const rotateImg = () => {
   deg.value = deg.value + 90;
   if (!currentImg.value) {
     const parentEl = document.querySelector(".user-upload-img");
-    const img = parentEl?.querySelectorAll("img")[0] as Record<string, any>;
+    const imgWapper = parentEl?.querySelectorAll(".van-swipe-item")[
+      props.startPosition || 0
+    ] as Record<string, any>;
+    console.log(imgWapper);
+    const img = imgWapper.querySelector("img");
+
     currentImg.value = img;
   }
   currentImg.value.style.setProperty(
@@ -30,7 +35,10 @@ const rotateImg = () => {
 const switchImg = (index: number) => {
   deg.value = 0;
   const parentEl = document.querySelector(".user-upload-img");
-  const img = parentEl?.querySelectorAll("img")[index] as Record<string, any>;
+  const imgWapper = parentEl?.querySelectorAll(".van-swipe-item")[
+    index
+  ] as Record<string, any>;
+  const img = imgWapper.querySelector("img");
   currentImg.value = img;
 };
 </script>
