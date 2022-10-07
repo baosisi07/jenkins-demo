@@ -68,7 +68,7 @@ export const userInfoStore = defineStore("user", {
 
       // name = encodeUserInfo(name);
       // password = encodeUserInfo(password);
-      const { code, message, data } = await api.user.login(params);
+      const { code, message, ...data } = await api.user.login(params);
       if (+code === 0) {
         Toast("登录成功");
         this.userParams = params;
@@ -82,6 +82,10 @@ export const userInfoStore = defineStore("user", {
   persist: {
     enabled: true,
     strategies: [
+      {
+        key: "userParams",
+        storage: localStorage,
+      },
       {
         key: "loginInfo",
         storage: localStorage,
