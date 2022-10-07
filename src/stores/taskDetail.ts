@@ -132,7 +132,6 @@ export const useDetailStore = defineStore("detail", {
             ? import.meta.env.VITE_IMG_PRE_PATH + item.detaildpath
             : "";
           const that = this;
-
           item.fileList = item.detaildpath
             ? [
                 {
