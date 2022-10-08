@@ -1,6 +1,6 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
-import { encryptByBase64DESqq } from "../utils/crypto.js";
+import { encryptByBase64DES } from "../utils/crypto.js";
 import api from "../http/api";
 import { Toast } from "vant";
 import "vant/es/toast/style";
