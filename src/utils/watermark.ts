@@ -95,7 +95,7 @@ const drawWaterMark = (
   for (let i = 0; i < wmConfig.textArray.length; i++) {
     ctx.fillText(
       wmConfig.textArray[i],
-      10,
+      fontSize,
       imgHeight -
         fontSize * (wmConfig.textArray.length + 1 - i) * wmConfig.lineHeight
     );
