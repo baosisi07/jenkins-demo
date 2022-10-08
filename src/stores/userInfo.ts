@@ -1,6 +1,6 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
-import { encryptDes, encodeUserInfo } from "../utils/crypto.js";
+import { encryptByBase64DESqq } from "../utils/crypto.js";
 import api from "../http/api";
 import { Toast } from "vant";
 import "vant/es/toast/style";
@@ -21,7 +21,7 @@ export const userInfoStore = defineStore("user", {
     },
     location: {
       lng: null,
-      lat: null
+      lat: null,
     },
     loginInfo: {
       backflag: "1",
@@ -63,15 +63,10 @@ export const userInfoStore = defineStore("user", {
   },
   actions: {
     async userLogin({ name, password }: any) {
-      // test
       const params = {
-        name: "utaLGxlOfh4=",
-        password: "FrgEcLSyBgU=",
+        name: encryptByBase64DES(name),
+        password: encryptByBase64DES(password),
       };
-      // test end
-
-      // name = encodeUserInfo(name);
-      // password = encodeUserInfo(password);
       const { code, message, ...data } = await api.user.login(params);
       if (+code === 0) {
         Toast("登录成功");
