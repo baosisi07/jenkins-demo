@@ -30,7 +30,7 @@ export const base64AddWaterMaker = async (base64Img: string) => {
   // 获取服务端时间
   const { time } = await api.task.getTime();
   const timestr = changeTimeFormat(time);
-
+  wmConfig.textArray = [];
   wmConfig.textArray.push(`时间： ${timestr}`);
   wmConfig.textArray.push(
     `经纬度： ${userStore.location.lng}, ${userStore.location.lat}`
