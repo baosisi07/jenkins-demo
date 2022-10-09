@@ -28,7 +28,7 @@ class api {
     },
   };
   public static task = {
-    getTime: async () => {
+    getTime: async (): Promise<any> => {
       userInfo = userInfoStore();
       return await Request.post("/taskservice.gettime", {
         ...userInfo.userParams,

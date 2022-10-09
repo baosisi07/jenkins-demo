@@ -76,7 +76,7 @@ const getLocationName = function (lng: number, lat: number) {
     }
   });
 };
-export default async function locationByBaidu() {
+export default async function locationByBaidu(): Promise<any> {
   const geolocation = new BMapGL.Geolocation();
   geolocation.enableSDKLocation();
   return new Promise((resolve) => {
