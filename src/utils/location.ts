@@ -1,5 +1,4 @@
 import { useDetailStore } from "../stores/taskDetail";
-import { userInfoStore } from "../stores/userInfo";
 //关于状态码
 const BMAP_STATUS_SUCCESS = 0; //检索成功。对应数值“0”。
 const BMAP_STATUS_CITY_LIST = 1; //城市列表。对应数值“1”。
@@ -77,24 +76,20 @@ const getLocationName = function (lng: number, lat: number) {
     }
   });
 };
-export default function locationByBaidu() {
+export default async function locationByBaidu() {
   const geolocation = new BMapGL.Geolocation();
   geolocation.enableSDKLocation();
-  geolocation.getCurrentPosition(function (r: any) {
-    if (this.getStatus() == BMAP_STATUS_SUCCESS) {
-      console.log("您的坐标：" + r.point.lng + "," + r.point.lat); // 这是百度坐标
-      const lng = r.point.lng;
-      const lat = r.point.lat;
-      getLocationName(lng, lat);
-      const userStore = userInfoStore();
-      userStore.$patch((state) => {
-        state.location = {
-          lat,
-          lng,
-        };
-      });
-    } else {
-      console.log("定位失败：" + this.getStatus());
-    }
+  return new Promise((resolve) => {
+    geolocation.getCurrentPosition(function (r: any) {
+      if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+        console.log("您的坐标：" + r.point.lng + "," + r.point.lat); // 这是百度坐标
+        const lng = r.point.lng;
+        const lat = r.point.lat;
+        getLocationName(lng, lat);
+        resolve({ lat, lng });
+      } else {
+        console.log("定位失败：" + this.getStatus());
+      }
+    });
   });
 }
