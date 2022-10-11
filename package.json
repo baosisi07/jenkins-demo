@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "@sangtian152/watermark": "^1.0.7",
+    "@types/echarts": "^4.9.16",
     "axios": "^0.27.2",
     "crypto-js": "^4.1.1",
+    "echarts": "^5.4.0",
     "jquery": "^3.6.1",
     "node-sass": "^7.0.3",
     "pinia": "^2.0.21",

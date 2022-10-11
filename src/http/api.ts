@@ -134,6 +134,12 @@ class api {
         },
       });
     },
+    getAllRate: async (): Promise<any> => {
+      userInfo = userInfoStore();
+      return await Request.post("/taskservice.getallrate", {
+        ...userInfo.userParams,
+      });
+    },
   };
 }
 export default api;
