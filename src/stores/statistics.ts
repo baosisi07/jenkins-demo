@@ -6,6 +6,7 @@ import "vant/es/toast/style";
 export const dataInfoStore = defineStore("data", {
   state: () => ({
     allTaskRates: [],
+    taskStateByMonth: [],
   }),
   getters: {},
   actions: {
@@ -17,6 +18,14 @@ export const dataInfoStore = defineStore("data", {
         });
         console.log(data, res);
         this.allTaskRates = res;
+      } else {
+        Toast.fail(message);
+      }
+    },
+    async getTaskStateBy(params: any) {
+      const { code, message, data } = await api.task.getTaskStateBy(params);
+      if (+code === 0) {
+        // this.taskStateByMonth = data;
       } else {
         Toast.fail(message);
       }

@@ -140,6 +140,19 @@ class api {
         ...userInfo.userParams,
       });
     },
+    getTaskStateBy: async ({
+      starttime,
+      endtime,
+      siteid,
+    }: TaskParams): Promise<any> => {
+      userInfo = userInfoStore();
+      return await Request.post("/taskservice.getdonerate", {
+        starttime,
+        endtime,
+        siteid,
+        ...userInfo.userParams,
+      });
+    },
   };
 }
 export default api;
