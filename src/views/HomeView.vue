@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import { useHomeStore } from "../stores/taskList";
+import { userInfoStore } from "../stores/userInfo";
 import { useRouter } from "vue-router";
 
+const isShowPopMenu = ref(false);
 const router = useRouter();
 const homeStore = useHomeStore();
+const userStore = userInfoStore();
 const getSiteList = async (type: string = "todo") => {
   homeStore.getSiteList(type);
 };
@@ -48,15 +52,43 @@ const createTask = () => {
     name: `create`,
   });
 };
+const toStatisics = () => {
+  router.push({
+    name: `statisics`,
+  });
+};
+const logOut = () => {
+  userStore.$patch({
+    userParams: { name: "", password: "" },
+    location: {},
+    loginInfo: {},
+  });
+  router.push({
+    name: `login`,
+  });
+};
 </script>
 
 <template>
   <main>
     <van-nav-bar title="运维">
+      <template #left>
+        <van-icon name="wap-nav" size="20" @click="isShowPopMenu = true" />
+      </template>
       <template #right>
         <van-icon name="plus" size="20" @click="createTask" />
       </template>
     </van-nav-bar>
+    <van-popup
+      v-model:show="isShowPopMenu"
+      position="left"
+      :style="{ width: '40%', height: '100vh' }"
+    >
+      <van-cell-group title="运维管理">
+        <van-cell title="数据统计" @click="toStatisics" />
+        <van-cell title="退出登录" @click="logOut" />
+      </van-cell-group>
+    </van-popup>
     <!-- scrollspy -->
     <van-tabs
       v-model:active="homeStore.activeType"
