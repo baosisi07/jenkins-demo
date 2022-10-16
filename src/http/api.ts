@@ -134,22 +134,17 @@ class api {
         },
       });
     },
-    getAllRate: async (): Promise<any> => {
+    getAllRate: async (params: TaskParams = {}): Promise<any> => {
       userInfo = userInfoStore();
       return await Request.post("/taskservice.getallrate", {
+        ...params,
         ...userInfo.userParams,
       });
     },
-    getTaskStateBy: async ({
-      starttime,
-      endtime,
-      siteid,
-    }: TaskParams): Promise<any> => {
+    getTaskStateBy: async (params: TaskParams = {}): Promise<any> => {
       userInfo = userInfoStore();
       return await Request.post("/taskservice.getdonerate", {
-        starttime,
-        endtime,
-        siteid,
+        ...params,
         ...userInfo.userParams,
       });
     },

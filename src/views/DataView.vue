@@ -39,11 +39,10 @@ const renderPieGraph = function () {
   };
   console.log(option);
   var chartDom = document.getElementById("graph1")!;
-  var myChart = echarts.init(chartDom, "dark");
+  var myChart = echarts.init(chartDom, "light");
   option && myChart.setOption(option);
 };
-const renderBarGraph = async function (params: any) {
-  await dataInfo.getTaskStateBy(params);
+const renderBarGraph = function () {
   var chartDom = document.getElementById("graph2")!;
   var myChart = echarts.init(chartDom);
   var option;
@@ -52,19 +51,42 @@ const renderBarGraph = async function (params: any) {
     legend: {},
     tooltip: {},
     dataset: {
-      source: [
-        // ["product", "2015", "2016", "2017"],
-        // ["Matcha Latte", 43.3, 85.8, 93.7],
-        // ["Milk Tea", 83.1, 73.4, 55.1],
-        // ["Cheese Cocoa", 86.4, 65.2, 82.5],
-        // ["Walnut Brownie", 72.4, 53.9, 39.1],
-      ],
+      source: dataInfo.taskStateBySite,
     },
     xAxis: { type: "category" },
     yAxis: {},
     // Declare several bar series, each will be mapped
     // to a column of dataset.source by default.
-    series: [{ type: "bar" }, { type: "bar" }, { type: "bar" }],
+    dataZoom: [
+      {
+        show: true,
+        start: 94,
+        end: 100,
+      },
+      {
+        type: "inside",
+        start: 94,
+        end: 100,
+      },
+      {
+        show: true,
+        yAxisIndex: 0,
+        filterMode: "empty",
+        width: 30,
+        height: "80%",
+        showDataShadow: false,
+        left: "93%",
+      },
+    ],
+    series: [
+      { type: "bar" },
+      { type: "bar" },
+      { type: "bar" },
+      { type: "bar" },
+      { type: "bar" },
+      { type: "bar" },
+      { type: "bar" },
+    ],
   };
 
   option && myChart.setOption(option);
@@ -77,40 +99,30 @@ onMounted(async () => {
   });
 });
 
-const active = ref(0);
+const active = ref("pie");
 const isShowSitePicker = ref(false);
-const isShowCalendar = ref(false);
-const minDate = new Date(2020, 0, 1);
-const maxDate = new Date();
 const formValues = reactive({
   sites: {} as Sites,
-  time: "",
 });
-const onConfirmCalendar = (date: Date[]) => {
-  const [start, end] = date;
-  formValues.time = `${start.getFullYear()}-${
-    start.getMonth() + 1
-  }-${start.getDate()},${end.getFullYear()}-${
-    end.getMonth() + 1
-  }-${end.getDate()}`;
-
-  isShowCalendar.value = false;
+const changeGraph = async () => {
+  let params = {
+    siteid: formValues.sites.siteid || "",
+  };
+  if (active.value === "pie") {
+    await dataInfo.getAllTaskData(params);
+    renderPieGraph();
+  } else {
+    console.log(dataInfo.taskStateBySite);
+    await dataInfo.getTaskStateBy(params);
+    renderBarGraph();
+  }
 };
-
 const onConfirm = (value: any) => {
   formValues.sites = value;
   isShowSitePicker.value = false;
+  changeGraph();
 };
-const onSubmit = async () => {
-  const { time, sites } = formValues;
-  const times = time.split(",");
-  let params = {
-    starttime: times[0],
-    endtime: times[1],
-    siteid: sites.siteid || "",
-  };
-  renderBarGraph(params);
-};
+
 const onClickLeft = () => {
   history.back();
 };
@@ -119,13 +131,10 @@ const onClickLeft = () => {
 <template>
   <div class="data-wrapper">
     <van-nav-bar title="数据统计" left-arrow @click-left="onClickLeft" />
-    <van-tabs color="#169186" v-model:active="active">
-      <van-tab title="饼图">
-        <div class="graph-content" id="graph1"></div>
-      </van-tab>
-      <van-tab title="柱状图">
-        <van-form @submit="onSubmit">
-          <van-cell-group inset>
+    <van-tabs color="#169186" v-model:active="active" @change="changeGraph">
+      <van-tab title="任务总览饼图" name="pie">
+        <van-form>
+          <van-cell-group>
             <van-field
               v-model="formValues.sites.sitename"
               is-link
@@ -135,31 +144,23 @@ const onClickLeft = () => {
               placeholder="点击选择站点名称"
               @click="isShowSitePicker = true"
             />
+          </van-cell-group>
+        </van-form>
+        <div class="graph-content" id="graph1"></div>
+      </van-tab>
+      <van-tab title="柱状图" name="bar">
+        <van-form>
+          <van-cell-group>
             <van-field
-              v-model="formValues.time"
+              v-model="formValues.sites.sitename"
               is-link
               readonly
-              name="starttime"
-              label="日期区间"
-              placeholder="点击选择日期区间"
-              :rules="[{ required: true, message: '请选择日期区间' }]"
-              @click="isShowCalendar = true"
-            />
-            <van-calendar
-              color="#169186"
-              type="range"
-              :max-range="365"
-              :min-date="minDate"
-              :max-date="maxDate"
-              v-model:show="isShowCalendar"
-              @confirm="onConfirmCalendar"
+              name="sitename"
+              label="站点名称"
+              placeholder="点击选择站点名称"
+              @click="isShowSitePicker = true"
             />
           </van-cell-group>
-          <div style="margin: 16px">
-            <van-button round block type="primary" native-type="submit">
-              查看图表
-            </van-button>
-          </div>
         </van-form>
         <div class="graph-content2" id="graph2"></div>
       </van-tab>
@@ -181,7 +182,7 @@ const onClickLeft = () => {
   padding: 20px 15px;
 }
 .graph-content2 {
-  height: 100vh;
+  height: 80vh;
   padding: 20px 15px;
   overflow-x: scroll;
 }
