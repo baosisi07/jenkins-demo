@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import api from "../http/api";
 import { Toast } from "vant";
 import "vant/es/toast/style";
+import Compressor from "compressorjs";
 import { base64AddWaterMaker, dataURLtoFile } from "../utils/watermark";
 interface subTasksItem {
   detailid: string;
@@ -74,7 +75,17 @@ export const useDetailStore = defineStore("detail", {
     },
     beforeRead(index: number) {
       const that = this;
-      return async function (file: any, detail: any) {};
+      return async function (file: any, detail: any) {
+        new Promise((resolve) => {
+          new Compressor(file, {
+            quality: 0.6,
+            success: resolve,
+            error(err) {
+              console.log(err.message);
+            },
+          });
+        });
+      };
     },
     afterRead(index: number) {
       const that = this;
@@ -89,7 +100,7 @@ export const useDetailStore = defineStore("detail", {
         const lastFile = dataURLtoFile(resultBase64);
         fileItem.message = "上传中...";
         const param = new FormData();
-        param.append("file", lastFile);
+        param.append("file", lastFile, file.file.name);
         console.log(param.get("file"));
         const { code, message, path } = await api.task.submitdetail({
           file: param,

@@ -6,7 +6,7 @@ import { userInfoStore } from "../stores/userInfo";
 import type { dutyPerson, Sites } from "../stores/userInfo";
 import "vant/es/dialog/style";
 import { base64AddWaterMaker, dataURLtoFile } from "../utils/watermark";
-
+import Compressor from "compressorjs";
 const newTaskStore = newTaskInfoStore();
 const userStore = userInfoStore();
 interface detailItem {
@@ -60,7 +60,7 @@ const afterRead = async (file: any, detail: any) => {
   file.message = "上传中...";
   // 此时可以自行将文件上传至服务器
   const param = new FormData();
-  param.append("file", lastFile);
+  param.append("file", lastFile, file.file.name);
   const { code } = await newTaskStore.uploadFile(param);
   if (+code === 0) {
     file.status = "done";
@@ -73,6 +73,17 @@ const afterRead = async (file: any, detail: any) => {
 };
 const beforeRead = async (file: any, detail: any) => {
   imgIndex.value = detail.index;
+  new Promise((resolve) => {
+    // compressorjs 默认开启 checkOrientation 选项
+    // 会将图片修正为正确方向
+    new Compressor(file, {
+      quality: 0.6,
+      success: resolve,
+      error(err) {
+        console.log(err.message);
+      },
+    });
+  });
 };
 const beforeDel = (file: any, detail: any) => {
   return Dialog.confirm({

@@ -13,6 +13,7 @@
     "@sangtian152/watermark": "^1.0.7",
     "@types/echarts": "^4.9.16",
     "axios": "^0.27.2",
+    "compressorjs": "^1.1.1",
     "crypto-js": "^4.1.1",
     "echarts": "^5.4.0",
     "jquery": "^3.6.1",
