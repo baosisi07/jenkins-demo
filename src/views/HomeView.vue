@@ -2,12 +2,31 @@
 import { ref } from "vue";
 import { useHomeStore } from "../stores/taskList";
 import { userInfoStore } from "../stores/userInfo";
-import { useRouter } from "vue-router";
-
+import { useRouter, useRoute } from "vue-router";
+import { Toast } from "vant";
 const isShowPopMenu = ref(false);
 const router = useRouter();
+const route = useRoute();
 const homeStore = useHomeStore();
 const userStore = userInfoStore();
+
+const token: string = route.query.token as string;
+if (token) {
+  userStore.$patch((state) => {
+    state.userParams.token = token;
+  });
+} else {
+  // token为空时
+  Toast("token为空");
+  // 用户名密码也为空时 跳转登录页
+  if (!userStore.isLoggedIn) {
+    setTimeout(function () {
+      router.push({
+        name: `login`,
+      });
+    }, 1000);
+  }
+}
 const getSiteList = async (type: string = "todo") => {
   homeStore.getSiteList(type);
 };

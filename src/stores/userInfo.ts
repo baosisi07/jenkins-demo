@@ -18,6 +18,7 @@ export const userInfoStore = defineStore("user", {
     userParams: {
       name: "",
       password: "",
+      token: "",
     },
     location: {
       lng: null,
@@ -32,7 +33,10 @@ export const userInfoStore = defineStore("user", {
   }),
   getters: {
     isLoggedIn: (state) => {
-      return state.userParams.name && state.userParams.password;
+      return (
+        (state.userParams.name && state.userParams.password) ||
+        state.userParams.token
+      );
     },
   },
   actions: {
@@ -44,7 +48,8 @@ export const userInfoStore = defineStore("user", {
       const { code, message, ...data } = await api.user.login(params);
       if (+code === 0) {
         Toast("登录成功");
-        this.userParams = params;
+        this.userParams.name = params.name;
+        this.userParams.password = params.password;
         this.loginInfo = data;
       } else {
         Toast(message);
