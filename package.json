@@ -9,6 +9,11 @@
     "type-check": "vue-tsc --noEmit",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
+  "config": {
+    "commitizen": {
+      "path": "git-cz"
+    }
+  },
   "dependencies": {
     "@sangtian152/watermark": "^1.0.7",
     "@types/echarts": "^4.9.16",
