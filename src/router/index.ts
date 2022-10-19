@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import { userInfoStore } from "../stores/userInfo";
+import { Toast } from "vant";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -47,6 +48,19 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   const userInfo = userInfoStore();
-  if (to.meta.requiresAuth && !userInfo.isLoggedIn) return "/login";
+  console.log("before router", to);
+  const token = to.query.token as string;
+  if (to.name === "home") {
+    if (token) {
+      userInfo.$patch((state) => {
+        state.userParams.token = token;
+      });
+    } else {
+      Toast("token为空");
+      if (to.meta.requiresAuth && !userInfo.isLoggedIn) return "/login";
+    }
+  } else {
+    if (to.meta.requiresAuth && !userInfo.isLoggedIn) return "/login";
+  }
 });
 export default router;
