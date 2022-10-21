@@ -15,6 +15,7 @@ class api {
         headers: {
           name: userInfo.userParams.name,
           password: userInfo.userParams.password,
+          ssotoken: userInfo.userParams.ssotoken,
           "Content-Type": "multipart/form-data",
         },
       });
@@ -129,6 +130,7 @@ class api {
         headers: {
           name: userInfo.userParams.name,
           password: userInfo.userParams.password,
+          ssotoken: userInfo.userParams.ssotoken,
           taskdetailid: taskdetailid,
           "Content-Type": "multipart/form-data",
         },
