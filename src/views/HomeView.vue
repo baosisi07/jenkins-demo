@@ -105,7 +105,7 @@ const logOut = () => {
     >
       <van-cell-group title="运维管理">
         <van-cell title="数据统计" @click="toStatisics" />
-        <van-cell title="退出登录" @click="logOut" />
+        <!-- <van-cell title="退出登录" @click="logOut" /> -->
       </van-cell-group>
     </van-popup>
     <!-- scrollspy -->
