@@ -53,7 +53,7 @@ router.beforeEach((to) => {
   if (to.name === "home") {
     if (token) {
       userInfo.$patch((state) => {
-        state.userParams.token = token;
+        state.userParams.ssotoken = token;
       });
     } else {
       Toast("token为空");

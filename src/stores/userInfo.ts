@@ -18,7 +18,7 @@ export const userInfoStore = defineStore("user", {
     userParams: {
       name: "",
       password: "",
-      token: "",
+      ssotoken: "",
     },
     location: {
       lng: null,

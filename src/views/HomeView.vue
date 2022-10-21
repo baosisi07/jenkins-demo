@@ -13,7 +13,7 @@ const userStore = userInfoStore();
 const token: string = route.query.token as string;
 if (token) {
   userStore.$patch((state) => {
-    state.userParams.token = token;
+    state.userParams.ssotoken = token;
   });
 } else {
   // token为空时
