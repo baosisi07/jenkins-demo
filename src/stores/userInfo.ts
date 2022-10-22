@@ -35,7 +35,7 @@ export const userInfoStore = defineStore("user", {
     isLoggedIn: (state) => {
       return (
         (state.userParams.name && state.userParams.password) ||
-        state.userParams.token
+        state.userParams.ssotoken
       );
     },
   },
@@ -44,15 +44,16 @@ export const userInfoStore = defineStore("user", {
       const params = {
         name: encryptByBase64DES(name),
         password: encryptByBase64DES(password),
+        ssotoken: this.userParams.ssotoken,
       };
       const { code, message, ...data } = await api.user.login(params);
       if (+code === 0) {
-        Toast("登录成功");
+        // Toast("登录成功");
         this.userParams.name = params.name;
         this.userParams.password = params.password;
         this.loginInfo = data;
       } else {
-        Toast(message);
+        // Toast(message);
       }
       return { code };
     },

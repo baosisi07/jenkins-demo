@@ -1,8 +1,11 @@
 import api from "../http/api";
 import locationByBaidu from "../utils/location";
+import { Toast } from "vant";
+import "vant/es/toast/style";
+
 export const dwmConfig = {
   font: "microsoft yahei", //字体
-  lineHeight: 1.2,
+  lineHeight: 1.8,
   textArray: [] as string[], // 文本内容
 };
 function changeTimeFormat(time: number) {
@@ -67,21 +70,22 @@ const drawWaterMark = (
 ) => {
   let fontSize: number;
   if (imgWidth >= 3456) {
-    fontSize = 50;
+    fontSize = 60;
   } else if (imgWidth >= 2700) {
-    fontSize = 30;
+    fontSize = 45;
   } else if (imgWidth >= 2000) {
-    fontSize = 26;
+    fontSize = 40;
   } else if (imgWidth >= 1436) {
-    fontSize = 20;
+    fontSize = 35;
   } else if (imgWidth >= 800) {
-    fontSize = 12;
+    fontSize = 30;
   } else if (imgWidth >= 500) {
-    fontSize = 10;
+    fontSize = 25;
   } else {
-    fontSize = 8;
+    fontSize = 20;
   }
   console.log(imgWidth, imgHeight, fontSize);
+  // Toast(fontSize)
   ctx.fillStyle = "white";
   ctx.font = `${fontSize}px ${wmConfig.font}`;
   ctx.lineHeight = wmConfig.lineHeight;

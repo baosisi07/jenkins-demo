@@ -14,6 +14,8 @@ const token: string = route.query.token as string;
 if (token) {
   userStore.$patch((state) => {
     state.userParams.ssotoken = token;
+    // 用 ssotoken 调用登录接口获取登录数据
+   userStore.userLogin("");
   });
 } else {
   // token为空时
